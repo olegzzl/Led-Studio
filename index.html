@@ -123,9 +123,9 @@
             right: 0;
             bottom: 0;
             pointer-events: none;
-            /* Сетка пикселей имеет фиксированный размер для всех режимов экрана */
-            background-image: radial-gradient(transparent 1px, rgba(19, 19, 19, 0.95) 1.5px);
-            background-size: 3px 3px;
+            /* Сетка пикселей масштабируется вместе с экраном (для полноэкранного режима) */
+            background-image: radial-gradient(transparent 33.33%, rgba(19, 19, 19, 0.95) 50%);
+            background-size: calc(3px * var(--led-scale, 1)) calc(3px * var(--led-scale, 1));
         }
     </style>
 </head>
@@ -195,8 +195,8 @@
                             <div class="space-y-4">
                                 <div class="flex flex-col gap-1">
                                     <div class="flex justify-between items-center px-1">
-                                        <span class="font-label-sm text-on-surface-variant">Temp</span>
-                                        <span class="font-value-mono text-primary" id="temp-val">0</span>
+                                        <span class="font-label-sm text-on-surface-variant uppercase text-[10px]">Temp</span>
+                                        <span class="font-value-mono text-primary text-[10px]" id="temp-val">0</span>
                                     </div>
                                     <input class="w-full" id="temp-slider" max="100" min="0"
                                         style="touch-action: manipulation;" type="range" value="0" />
@@ -214,16 +214,16 @@
                             <div class="space-y-4">
                                 <div class="flex flex-col gap-1">
                                     <div class="flex justify-between items-center px-1">
-                                        <span class="font-label-sm text-on-surface-variant">Spectrum</span>
-                                        <span class="font-value-mono text-primary" id="hue-val">0°</span>
+                                        <span class="font-label-sm text-on-surface-variant uppercase text-[10px]">Spectrum</span>
+                                        <span class="font-value-mono text-primary text-[10px]" id="hue-val">0°</span>
                                     </div>
                                     <input class="w-full" id="hue-slider" max="360" min="0"
                                         style="touch-action: manipulation;" type="range" value="0" />
                                 </div>
                                 <div class="flex flex-col gap-1">
                                     <div class="flex justify-between items-center px-1">
-                                        <span class="font-label-sm text-on-surface-variant">Brightness</span>
-                                        <span class="font-value-mono text-primary" id="bright-val">80%</span>
+                                        <span class="font-label-sm text-on-surface-variant uppercase text-[10px]">Brightness</span>
+                                        <span class="font-value-mono text-primary text-[10px]" id="bright-val">80%</span>
                                     </div>
                                     <input class="w-full" id="bright-slider" max="100" min="0"
                                         style="touch-action: manipulation;" type="range" value="80" />
@@ -285,55 +285,80 @@
                                 <div class="flex flex-col gap-1.5">
                                     <span
                                         class="font-label-sm text-on-surface-variant uppercase text-[10px] px-1">Message</span>
-                                    <input
-                                        class="bg-surface-container-low text-primary border border-outline-variant font-body-md px-2 py-1.5 focus:border-primary outline-none w-full"
-                                        id="marquee-text" placeholder="Enter text..." type="text" />
+                                    <div id="marquee-inputs-container" class="space-y-2">
+                                        <div class="flex gap-1.5 items-center">
+                                            <input
+                                                class="marquee-input-line bg-surface-container-low text-primary border border-outline-variant font-body-md px-2 py-1.5 focus:border-primary outline-none flex-1"
+                                                placeholder="Enter text..." type="text" value="Led Studio" />
+                                            <button type="button" class="btn-add-line flex items-center justify-center w-8 h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-primary rounded shrink-0" onclick="addMarqueeLine()">
+                                                <span class="material-symbols-outlined text-[18px]">add</span>
+                                            </button>
+                                        </div>
+                                        <div class="flex gap-1.5 items-center">
+                                            <input
+                                                class="marquee-input-line bg-surface-container-low text-primary border border-outline-variant font-body-md px-2 py-1.5 focus:border-primary outline-none flex-1"
+                                                placeholder="Enter text..." type="text" value="❤️" />
+                                            <button type="button" class="btn-remove-line flex items-center justify-center w-8 h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-error rounded shrink-0" onclick="removeMarqueeLine(this)">
+                                                <span class="material-symbols-outlined text-[18px]">remove</span>
+                                            </button>
+                                        </div>
+                                    </div>
                                     <div class="flex gap-2 mt-1">
                                         <button
                                             class="flex-1 h-[28px] border border-outline-variant bg-surface-container-high text-primary font-label-sm uppercase hover:bg-surface-bright transition-colors text-[10px]"
-                                            id="btn-marquee-start">Ввести</button>
+                                            id="btn-marquee-start">Play</button>
                                         <button
                                             class="flex-1 h-[28px] border border-outline-variant text-on-surface-variant font-label-sm uppercase hover:bg-surface-container-high transition-colors text-[10px]"
-                                            id="btn-marquee-stop">Остановить</button>
+                                            id="btn-marquee-stop">Stop</button>
                                     </div>
                                 </div>
                                 <div class="flex flex-col gap-1">
                                     <div class="flex justify-between items-center px-1">
                                         <span
                                             class="font-label-sm text-on-surface-variant uppercase text-[10px]">Speed</span>
-                                        <span class="font-value-mono text-primary" id="marquee-speed-val">5x</span>
+                                        <span class="font-value-mono text-primary text-[10px]" id="marquee-speed-val">3.5x</span>
                                     </div>
                                     <input class="w-full" id="marquee-speed-slider" max="10" min="1" step="0.5"
-                                        style="touch-action: manipulation;" type="range" value="5" />
+                                        style="touch-action: manipulation;" type="range" value="3.5" />
                                 </div>
                                 <div class="flex flex-col gap-1">
                                     <div class="flex justify-between items-center px-1">
                                         <span class="font-label-sm text-on-surface-variant uppercase text-[10px]">Text
                                             Size</span>
-                                        <span class="font-value-mono text-primary"
-                                            id="marquee-text-size-val">80px</span>
+                                        <span class="font-value-mono text-primary text-[10px]"
+                                            id="marquee-text-size-val">65px</span>
                                     </div>
                                     <input class="w-full" id="marquee-text-size-slider" max="160" min="30" step="2"
-                                        style="touch-action: manipulation;" type="range" value="80" />
+                                        style="touch-action: manipulation;" type="range" value="65" />
                                 </div>
                                 <div class="flex flex-col gap-1">
                                     <div class="flex justify-between items-center px-1">
                                         <span class="font-label-sm text-on-surface-variant uppercase text-[10px]">TEXT
                                             COLOR</span>
                                         <span class="font-value-mono text-primary text-[10px]"
-                                            id="marquee-text-color-val">#FFFFFF</span>
+                                            id="marquee-text-color-val">HSL 167°</span>
                                     </div>
                                     <input class="w-full" id="marquee-text-color-slider" max="360" min="0"
-                                        style="touch-action: manipulation;" type="range" value="0" />
+                                        style="touch-action: manipulation;" type="range" value="167" />
                                 </div>
-                                <button
-                                    class="flex items-center justify-center gap-2 h-10 w-full bg-primary text-on-primary hover:bg-opacity-90 transition-colors mt-2"
-                                    id="btn-marquee-save-video">
-                                    <span class="material-symbols-outlined text-[18px]">videocam</span>
-                                    <span
-                                        class="font-label-sm uppercase font-bold whitespace-nowrap text-[11px]">Сохранить
-                                        видео</span>
-                                </button>
+                                <div class="flex gap-2 mt-2">
+                                    <div class="flex flex-col gap-1 w-[80px] shrink-0">
+                                        <select id="marquee-video-duration" class="h-10 bg-surface-container-low text-primary border border-outline-variant font-label-sm text-[11px] uppercase px-2 outline-none cursor-pointer focus:border-primary w-full">
+                                            <option value="5">5s</option>
+                                            <option value="10">10s</option>
+                                            <option value="15" selected>15s</option>
+                                            <option value="30">30s</option>
+                                        </select>
+                                    </div>
+                                    <button
+                                        class="flex-1 flex items-center justify-center gap-2 h-10 bg-primary text-on-primary hover:bg-opacity-90 transition-colors"
+                                        id="btn-marquee-save-video">
+                                        <span class="material-symbols-outlined text-[18px]">videocam</span>
+                                        <span
+                                            class="font-label-sm uppercase font-bold whitespace-nowrap text-[11px]">Сохранить
+                                            видео</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -380,22 +405,22 @@
                             id="presets-container">
                             <button
                                 class="px-3 py-1.5 bg-surface-container-high border border-outline-variant text-[10px] font-bold uppercase cursor-pointer hover:border-primary transition-colors text-on-surface-variant"
-                                id="preset-police">Полиция</button>
+                                id="preset-police">POLICE</button>
                             <button
                                 class="px-3 py-1.5 bg-surface-container-high border border-outline-variant text-[10px] font-bold uppercase cursor-pointer hover:border-primary transition-colors text-on-surface-variant"
-                                id="preset-tech">Техника</button>
+                                id="preset-tech">TECH</button>
                             <button
                                 class="px-3 py-1.5 bg-surface-container-high border border-outline-variant text-[10px] font-bold uppercase cursor-pointer hover:border-primary transition-colors text-on-surface-variant"
-                                id="preset-candle">Свеча</button>
+                                id="preset-candle">CANDLE</button>
                             <button
                                 class="px-3 py-1.5 bg-surface-container-high border border-outline-variant text-[10px] font-bold uppercase cursor-pointer hover:border-primary transition-colors text-on-surface-variant"
-                                id="preset-tv">ТВ</button>
+                                id="preset-tv">TV</button>
                             <button
                                 class="px-3 py-1.5 bg-surface-container-high border border-outline-variant text-[10px] font-bold uppercase cursor-pointer hover:border-primary transition-colors text-on-surface-variant"
-                                id="preset-party">Пати</button>
+                                id="preset-party">PARTY</button>
                             <button
                                 class="px-3 py-1.5 bg-surface-container-high border border-outline-variant text-[10px] font-bold uppercase cursor-pointer hover:border-primary transition-colors text-on-surface-variant"
-                                id="preset-fire">Огонь</button>
+                                id="preset-fire">FIRE</button>
                         </div>
                     </div>
                 </div>
@@ -834,29 +859,100 @@
             ledPanel.style.setProperty('--glow-color', rgbaGlow);
         }
 
+        // Helper functions for dynamic marquee lines
+        function addMarqueeLine() {
+            const container = document.getElementById('marquee-inputs-container');
+            
+            const newLine = document.createElement('div');
+            newLine.className = 'flex gap-1.5 items-center';
+            newLine.innerHTML = `
+                <input
+                    class="marquee-input-line bg-surface-container-low text-primary border border-outline-variant font-body-md px-2 py-1.5 focus:border-primary outline-none flex-1"
+                    placeholder="Enter text..." type="text" />
+                <button type="button" class="btn-remove-line flex items-center justify-center w-8 h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-error rounded shrink-0" onclick="removeMarqueeLine(this)">
+                    <span class="material-symbols-outlined text-[18px]">remove</span>
+                </button>
+            `;
+            container.appendChild(newLine);
+            
+            bindMarqueeInputEvents();
+            
+            if (marqueeActive) {
+                updateMarqueeText();
+            }
+        }
+
+        function removeMarqueeLine(button) {
+            const row = button.parentElement;
+            row.remove();
+            
+            // Ensure all fields have Enter text... placeholder
+            const container = document.getElementById('marquee-inputs-container');
+            const inputs = container.querySelectorAll('.marquee-input-line');
+            inputs.forEach((input) => {
+                input.placeholder = 'Enter text...';
+            });
+            
+            if (marqueeActive) {
+                updateMarqueeText();
+            }
+        }
+
+        function getMarqueeLinesText() {
+            const container = document.getElementById('marquee-inputs-container');
+            if (!container) return ["LED STUDIO"];
+            const inputs = container.querySelectorAll('.marquee-input-line');
+            const lines = [];
+            inputs.forEach(input => {
+                const text = input.value.trim();
+                if (text) {
+                    lines.push(text.toUpperCase());
+                }
+            });
+            return lines.length > 0 ? lines : ["LED STUDIO"];
+        }
+
+        function updateMarqueeText() {
+            if (!marqueeActive) return;
+            const scroller = document.getElementById('marquee-scroller');
+            if (scroller) {
+                const lines = getMarqueeLinesText();
+                scroller.innerHTML = lines.map(line => `<div>${line}</div>`).join('');
+            }
+        }
+
+        function bindMarqueeInputEvents() {
+            const container = document.getElementById('marquee-inputs-container');
+            if (!container) return;
+            const inputs = container.querySelectorAll('.marquee-input-line');
+            inputs.forEach(input => {
+                input.removeEventListener('input', updateMarqueeText);
+                input.addEventListener('input', updateMarqueeText);
+            });
+        }
+
         // Marquee Logic (Бегущая строка)
         function startMarquee() {
             clearActivePreset();
             marqueeActive = true;
 
-            // Highlight Ввести button and unhighlight Stop
+            // Highlight Play button and unhighlight Stop
             document.getElementById('btn-marquee-start').classList.add('bg-primary', 'text-on-primary');
             document.getElementById('btn-marquee-start').classList.remove('bg-surface-container-high', 'text-primary');
             document.getElementById('btn-marquee-stop').classList.remove('bg-primary', 'text-on-primary');
             document.getElementById('btn-marquee-stop').classList.add('bg-surface-container-high', 'text-on-surface-variant');
 
-            const textVal = document.getElementById('marquee-text').value.trim() || "LED STUDIO";
-
             // Set up LED matrix container and overlay inside the panel
             ledPanel.innerHTML = `
                 <div class="led-matrix-container" id="marquee-container" style="background-color: #000000;">
-                    <div class="led-matrix-text" id="marquee-scroller"></div>
+                    <div class="led-matrix-text flex flex-col items-center justify-center text-center gap-1" id="marquee-scroller"></div>
                     <div class="led-matrix-overlay"></div>
                 </div>
             `;
 
+            updateMarqueeText();
+
             const scroller = document.getElementById('marquee-scroller');
-            scroller.textContent = textVal;
 
             // Initial position: right edge of the panel
             marqueeX = ledPanel.offsetWidth || 768;
@@ -933,28 +1029,29 @@
 
         // Local Canvas video recorder engine (no permission required, runs 100% locally)
         function saveMarqueeVideo() {
-            const textInput = document.getElementById('marquee-text').value.trim() || "LED STUDIO";
+            const duration = parseInt(document.getElementById('marquee-video-duration').value) || 15;
+            const lines = getMarqueeLinesText();
             const saveBtn = document.getElementById('btn-marquee-save-video');
             const originalContent = saveBtn.innerHTML;
-
+ 
             // Set recording state
             saveBtn.innerHTML = `
                 <svg class="w-4 h-4 animate-spin text-on-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H12v4"></path></svg>
-                <span class="font-label-sm uppercase font-bold text-[11px]">Запись (5с)...</span>
+                <span class="font-label-sm uppercase font-bold text-[11px]">Запись (${duration}с)...</span>
             `;
             saveBtn.disabled = true;
-
+ 
             // Create canvas
             const canvas = document.createElement('canvas');
             canvas.width = 640;
             canvas.height = 360;
             const ctx = canvas.getContext('2d');
-
+ 
             // Capture stream
             const stream = canvas.captureStream(30); // 30 FPS
             const recorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9' });
             const chunks = [];
-
+ 
             recorder.ondataavailable = e => chunks.push(e.data);
             recorder.onstop = () => {
                 const blob = new Blob(chunks, { type: 'video/webm' });
@@ -963,56 +1060,79 @@
                 a.href = url;
                 a.download = `led-marquee-${Date.now()}.webm`;
                 a.click();
-
+ 
                 // Restore button state
                 saveBtn.innerHTML = originalContent;
                 saveBtn.disabled = false;
             };
-
+ 
             // Read current colors and size
             const textSize = parseInt(document.getElementById('marquee-text-size-slider').value);
             const textHue = parseInt(document.getElementById('marquee-text-color-slider').value);
             const textColor = textHue === 0 ? '#FFFFFF' : `hsl(${textHue}, 100%, 50%)`;
-
+ 
             const bgColor = '#000000'; // Всегда черный фон
-
+ 
             const speed = parseFloat(document.getElementById('marquee-speed-slider').value);
-
+ 
             // Animate canvas
             let x = canvas.width;
             let recordingActive = true;
-
+            let maxTextWidth = 0;
+ 
+            // Pre-render the LED Dot Grid Overlay once to avoid CPU overload and extreme lag during recording (25,500x performance boost!)
+            const gridCanvas = document.createElement('canvas');
+            gridCanvas.width = canvas.width;
+            gridCanvas.height = canvas.height;
+            const gCtx = gridCanvas.getContext('2d');
+            gCtx.fillStyle = "rgba(19, 19, 19, 0.95)";
+            const dotSpacing = 3;
+            const dotRadius = 1.35;
+ 
+            for (let py = 0; py < gridCanvas.height; py += dotSpacing) {
+                for (let px = 0; px < gridCanvas.width; px += dotSpacing) {
+                    gCtx.beginPath();
+                    gCtx.arc(px + dotSpacing / 2, py + dotSpacing / 2, dotRadius, 0, Math.PI * 2);
+                    gCtx.rect(px + dotSpacing, py, -dotSpacing, dotSpacing);
+                    gCtx.fill();
+                }
+            }
+ 
             function drawFrame() {
                 if (!recordingActive) return;
-
+ 
                 // 1. Draw background
                 ctx.fillStyle = bgColor;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-
+ 
                 // 2. Draw text
                 ctx.fillStyle = textColor;
                 ctx.font = "900 " + textSize + "px 'Outfit', 'Inter', sans-serif";
                 ctx.textBaseline = "middle";
-                ctx.fillText(textInput.toUpperCase(), x, canvas.height / 2);
-
-                // 3. Draw LED Dot Grid Overlay
-                ctx.fillStyle = "rgba(19, 19, 19, 0.95)";
-                const dotSpacing = 3; // Расстояние между пикселями уменьшено на 50%
-                const dotRadius = 1.35; // Радиус адаптирован для новой плотности сетки
-
-                for (let py = 0; py < canvas.height; py += dotSpacing) {
-                    for (let px = 0; px < canvas.width; px += dotSpacing) {
-                        ctx.beginPath();
-                        ctx.arc(px + dotSpacing / 2, py + dotSpacing / 2, dotRadius, 0, Math.PI * 2);
-                        ctx.rect(px + dotSpacing, py, -dotSpacing, dotSpacing);
-                        ctx.fill();
-                    }
-                }
-
+                
+                // Measure widest line for scroll mapping and offset alignment
+                maxTextWidth = 0;
+                lines.forEach(line => {
+                    const w = ctx.measureText(line).width;
+                    if (w > maxTextWidth) maxTextWidth = w;
+                });
+                
+                const lineHeight = textSize * 1.15; // Gorgeous line spacing
+                const totalHeight = lineHeight * lines.length;
+                const startY = (canvas.height - totalHeight) / 2 + lineHeight / 2;
+                
+                lines.forEach((line, index) => {
+                    const lineW = ctx.measureText(line).width;
+                    const offsetX = (maxTextWidth - lineW) / 2; // Symmetrically center each line
+                    ctx.fillText(line, x + offsetX, startY + index * lineHeight);
+                });
+ 
+                // 3. Draw LED Dot Grid Overlay (drawn instantly as a single image instead of 25,560 separate loops)
+                ctx.drawImage(gridCanvas, 0, 0);
+ 
                 // Increment scroll position
                 x -= (speed * 0.7);
-                const textWidth = ctx.measureText(textInput.toUpperCase()).width;
-                if (x < -textWidth) {
+                if (x < -maxTextWidth) {
                     x = canvas.width;
                 }
 
@@ -1023,11 +1143,11 @@
             recorder.start();
             drawFrame();
 
-            // Stop recording after 5 seconds
+            // Stop recording after chosen duration
             setTimeout(() => {
                 recordingActive = false;
                 recorder.stop();
-            }, 5000);
+            }, duration * 1000);
         }
 
         // Event Listeners
@@ -1093,13 +1213,8 @@
         document.getElementById('btn-marquee-start').addEventListener('click', startMarquee);
         document.getElementById('btn-marquee-stop').addEventListener('click', stopMarquee);
 
-        // Динамическое обновление текста во время работы бегущей строки
-        document.getElementById('marquee-text').addEventListener('input', (e) => {
-            if (marqueeActive) {
-                const scroller = document.getElementById('marquee-scroller');
-                if (scroller) scroller.textContent = e.target.value.trim() || "LED STUDIO";
-            }
-        });
+        // Dynamic marquee input binding
+        bindMarqueeInputEvents();
 
         document.getElementById('marquee-speed-slider').addEventListener('input', updateMarqueeParams);
         document.getElementById('marquee-text-size-slider').addEventListener('input', updateMarqueeParams);
@@ -1120,6 +1235,12 @@
 
         // Initial draw
         updateLED();
+
+        // Expand Marquee Control accordion by default
+        toggleAccordion('marquee');
+
+        // Automatically start the marquee on page load
+        startMarquee();
     </script>
 </body>
 

@@ -353,7 +353,7 @@ function startMarquee() {
     clearActivePreset();
     marqueeActive = true;
     
-    // Highlight Ввести button and unhighlight Stop
+    // Highlight Play button and unhighlight Stop
     document.getElementById('btn-marquee-start').classList.add('bg-primary', 'text-on-primary');
     document.getElementById('btn-marquee-start').classList.remove('bg-surface-container-high', 'text-primary');
     document.getElementById('btn-marquee-stop').classList.remove('bg-primary', 'text-on-primary');
