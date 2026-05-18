@@ -464,16 +464,31 @@
         let marqueeAnimFrame = null;
         let ledScale = 1;
         let preFullscreenWidth = 768;
+        let preFullscreenHeight = 432; // 16:9 aspect ratio for 768 width
 
         // Наблюдатель изменения размеров для динамического масштабирования в полноэкранном режиме
         const ledResizeObserver = new ResizeObserver(entries => {
             for (let entry of entries) {
+                const { width, height } = entry.contentRect;
+
                 if (document.fullscreenElement) {
+                    // Ensure we have valid pre-fullscreen dimensions to calculate from
                     if (preFullscreenWidth === 0) preFullscreenWidth = 768;
-                    ledScale = entry.contentRect.width / preFullscreenWidth;
+                    if (preFullscreenHeight === 0) preFullscreenHeight = 432;
+
+                    // Calculate scale based on both width and height changes
+                    const scaleX = width / preFullscreenWidth;
+                    const scaleY = height / preFullscreenHeight;
+
+                    // Use the SMALLER scale factor. This prevents the grid from becoming too large
+                    // when changing orientation on mobile (e.g., portrait to landscape fullscreen).
+                    ledScale = Math.min(scaleX, scaleY);
+
                 } else {
+                    // When not in fullscreen, reset scale and capture the current dimensions as the baseline
                     ledScale = 1;
-                    preFullscreenWidth = entry.contentRect.width || 768;
+                    preFullscreenWidth = width || 768;
+                    preFullscreenHeight = height || 432;
                 }
                 ledPanel.style.setProperty('--led-scale', ledScale);
                 if (marqueeActive && typeof updateMarqueeParams === 'function') {
