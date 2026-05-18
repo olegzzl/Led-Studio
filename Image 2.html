@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LUX_STUDIO_V1 | LED Control</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary-fixed-dim": "#c6c6c7",
+                      "tertiary-container": "#e2e2e2",
+                      "outline-variant": "#444748",
+                      "surface-variant": "#353535",
+                      "background": "#131313",
+                      "surface-container-high": "#2a2a2a",
+                      "on-primary-fixed-variant": "#454747",
+                      "inverse-surface": "#e5e2e1",
+                      "on-error-container": "#ffdad6",
+                      "on-surface": "#e5e2e1",
+                      "surface": "#131313",
+                      "secondary": "#c8c6c6",
+                      "on-secondary-fixed": "#1b1c1c",
+                      "on-surface-variant": "#c4c7c8",
+                      "on-primary": "#2f3131",
+                      "on-error": "#690005",
+                      "surface-container-low": "#1b1c1c",
+                      "secondary-fixed": "#e4e2e2",
+                      "outline": "#8e9192",
+                      "primary": "#ffffff",
+                      "on-secondary-container": "#b9b8b8",
+                      "error-container": "#93000a",
+                      "on-tertiary-container": "#636565",
+                      "surface-container": "#1f2020",
+                      "on-secondary-fixed-variant": "#474747",
+                      "surface-dim": "#131313",
+                      "error": "#ffb4ab",
+                      "primary-container": "#e2e2e2",
+                      "on-tertiary": "#2f3131",
+                      "on-primary-fixed": "#1a1c1c",
+                      "surface-bright": "#393939",
+                      "on-background": "#e5e2e1",
+                      "primary-fixed": "#e2e2e2",
+                      "on-tertiary-fixed-variant": "#454747",
+                      "on-primary-container": "#636565",
+                      "secondary-container": "#494949",
+                      "on-tertiary-fixed": "#1a1c1c",
+                      "inverse-on-surface": "#303030",
+                      "tertiary-fixed-dim": "#c6c6c7",
+                      "inverse-primary": "#5d5f5f",
+                      "surface-container-lowest": "#0e0e0e",
+                      "tertiary-fixed": "#e2e2e2",
+                      "surface-tint": "#c6c6c7",
+                      "secondary-fixed-dim": "#c8c6c6",
+                      "on-secondary": "#303030",
+                      "tertiary": "#ffffff",
+                      "surface-container-highest": "#353535"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "sidebar-width": "340px",
+                      "control-gap": "8px",
+                      "gutter": "1px",
+                      "panel-padding": "12px",
+                      "unit": "4px"
+              },
+              "fontFamily": {
+                      "body-md": ["Inter"],
+                      "label-sm": ["Inter"],
+                      "section-header": ["Inter"],
+                      "value-mono": ["Inter"]
+              },
+              "fontSize": {
+                      "body-md": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                      "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "500"}],
+                      "section-header": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                      "value-mono": ["12px", {"lineHeight": "16px", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        body { background-color: #131313; color: #e5e2e1; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20; }
+        
+        input[type=range] { -webkit-appearance: none; background: transparent; cursor: pointer; }
+        input[type=range]::-webkit-slider-runnable-track { height: 1px; background: #444748; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 12px;
+            width: 8px;
+            background: #A5A5A5;
+            margin-top: -5.5px;
+            border-radius: 1px;
+            transition: background 0.15s ease;
+        }
+        input[type=range]:hover::-webkit-slider-thumb { background: #FFFFFF; }
+        
+        #led-panel {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 80px var(--glow-color, rgba(255,255,255,0.1));
+        }
+
+        @keyframes strobe {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.1; }
+        }
+        .animate-strobe { animation: strobe 0.1s infinite; }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .animate-blink { animation: blink 0.8s infinite; }
+        
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #353535; }
+        ::-webkit-scrollbar-thumb:hover { background: #444748; }
+    
+        @media (max-width: 768px) {
+            input[type=range] {
+                height: 32px;
+                touch-action: manipulation;
+            }
+            input[type=range]::-webkit-slider-runnable-track {
+                height: 4px;
+            }
+            input[type=range]::-webkit-slider-thumb {
+                height: 24px;
+                width: 16px;
+                margin-top: -10px;
+            }
+        }
+
+        /* Accordion Animations */
+        .accordion-content {
+            display: grid;
+            grid-template-rows: 1fr;
+            transition: grid-template-rows 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+            opacity: 1;
+        }
+        .accordion-content.collapsed {
+            grid-template-rows: 0fr;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .accordion-inner {
+            overflow: hidden;
+        }
+        .chevron-icon {
+            transition: transform 0.3s ease;
+        }
+        .chevron-icon.collapsed {
+            transform: rotate(-90deg);
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen font-body-md overflow-x-hidden">
+<header class="bg-surface border-b border-outline-variant flex justify-between items-center w-full px-panel-padding h-12 z-50 shrink-0">
+<div class="font-section-header text-section-header font-bold uppercase tracking-widest text-primary">
+        LUX_STUDIO_V1
+    </div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-surface-container-high p-1 transition-colors">settings</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-surface-container-high p-1 transition-colors">info</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-surface-container-high p-1 transition-colors" style='font-variation-settings: "FILL" 1;'>account_circle</span>
+</div>
+</header>
+<main class="flex flex-col flex-1 relative md:flex-row h-[calc(100vh-48px)] overflow-hidden">
+<!-- Main Viewport: LED Display -->
+<section class="flex-1 flex flex-col items-center justify-center p-8 md:p-12 lg:p-24 bg-background relative overflow-y-auto">
+<div class="w-full max-w-3xl aspect-video rounded-lg border border-outline-variant relative overflow-hidden" id="led-panel" style="background-color: #FFFFFF;"></div>
+<div class="mt-8 text-on-surface-variant font-label-sm tracking-widest opacity-40 uppercase">
+            Output Preview
+        </div>
+</section>
+<!-- Right Sidebar (Controls) -->
+<aside class="w-full md:w-sidebar-width bg-surface-container-low border-t md:border-t-0 md:border-l border-outline-variant flex flex-col h-full overflow-y-auto shrink-0">
+<!-- Adjustments Section -->
+<div class="flex flex-col border-b border-outline-variant">
+<button class="w-full flex flex-col px-panel-padding py-4 hover:bg-surface-container-high transition-colors group text-left" onclick="toggleAccordion('adjustments')">
+<div class="flex justify-between items-center w-full">
+<span class="font-section-header text-section-header text-primary uppercase">Adjustments</span>
+<span class="chevron-icon material-symbols-outlined text-on-surface-variant text-[18px]" id="chevron-adjustments">expand_more</span>
+</div>
+<div class="text-[9px] text-outline tracking-widest mt-1">MASTER_CONTROL</div>
+</button>
+<div class="accordion-content" id="content-adjustments">
+<div class="accordion-inner">
+<!-- White Balance -->
+<div class="px-panel-padding py-4 border-t border-outline-variant">
+<div class="flex items-center gap-2 mb-3">
+<span class="text-[8px] transform rotate-90 text-on-surface-variant">▲</span>
+<span class="font-section-header text-section-header uppercase">White Balance</span>
+</div>
+<div class="space-y-4">
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-center px-1">
+<span class="font-label-sm text-on-surface-variant">Temp</span>
+<span class="font-value-mono text-primary" id="temp-val">0</span>
+</div>
+<input class="w-full" id="temp-slider" max="100" min="0" style="touch-action: manipulation;" type="range" value="0"/>
+</div>
+</div>
+</div>
+<!-- Hue & Intensity -->
+<div class="px-panel-padding py-4 border-t border-outline-variant">
+<div class="flex items-center gap-2 mb-3">
+<span class="text-[8px] transform rotate-90 text-on-surface-variant">▲</span>
+<span class="font-section-header text-section-header uppercase">Hue &amp; Intensity</span>
+</div>
+<div class="space-y-4">
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-center px-1">
+<span class="font-label-sm text-on-surface-variant">Spectrum</span>
+<span class="font-value-mono text-primary" id="hue-val">0°</span>
+</div>
+<input class="w-full" id="hue-slider" max="360" min="0" style="touch-action: manipulation;" type="range" value="0"/>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-center px-1">
+<span class="font-label-sm text-on-surface-variant">Brightness</span>
+<span class="font-value-mono text-primary" id="bright-val">80%</span>
+</div>
+<input class="w-full" id="bright-slider" max="100" min="0" style="touch-action: manipulation;" type="range" value="80"/>
+</div>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="px-panel-padding py-6 space-y-3 bg-surface-container-low/50 border-t border-outline-variant">
+<div class="grid gap-2 grid-cols-2">
+<button class="flex flex-col items-center justify-center gap-1 h-16 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant group" id="btn-strobe">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary">flash_on</span>
+<span class="font-label-sm uppercase text-[10px]">Strobe</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-1 h-16 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant group" id="btn-blink">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary">timer_10_alt_1</span>
+<span class="font-label-sm uppercase text-[10px]">Blink</span>
+</button>
+</div>
+<div class="grid gap-2 grid-cols-2">
+<button class="flex items-center justify-center gap-2 h-10 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">add_circle</span>
+<span class="font-label-sm uppercase">Add</span>
+</button>
+<button class="flex items-center justify-center gap-2 h-10 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">save</span>
+<span class="font-label-sm uppercase">Save</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Marquee Control Block -->
+<div class="flex flex-col border-b border-outline-variant">
+<button class="w-full flex items-center justify-between px-panel-padding py-4 hover:bg-surface-container-high transition-colors group text-left bg-surface-container/30" onclick="toggleAccordion('marquee')">
+<div class="flex items-center gap-2">
+<span class="font-section-header text-section-header uppercase">Marquee Control</span>
+</div>
+<span class="chevron-icon material-symbols-outlined text-on-surface-variant text-[18px]" id="chevron-marquee">expand_more</span>
+</button>
+<div class="accordion-content bg-surface-container/30" id="content-marquee">
+<div class="accordion-inner">
+<div class="px-panel-padding py-4 border-t border-outline-variant">
+<div class="space-y-5">
+<div class="flex flex-col gap-1.5">
+<span class="font-label-sm text-on-surface-variant uppercase text-[10px] px-1">Message</span>
+<input class="bg-surface-container-low text-primary border border-outline-variant font-body-md px-2 py-1.5 focus:border-primary outline-none w-full" placeholder="Enter text..." type="text"/>
+<div class="flex gap-2 mt-1">
+<button class="flex-1 h-[28px] border border-outline-variant bg-surface-container-high text-primary font-label-sm uppercase hover:bg-surface-bright transition-colors text-[10px]">Ввести</button>
+<button class="flex-1 h-[28px] border border-outline-variant text-on-surface-variant font-label-sm uppercase hover:bg-surface-container-high transition-colors text-[10px]">Вставитстра</button>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-center px-1">
+<span class="font-label-sm text-on-surface-variant uppercase text-[10px]">Speed</span>
+<span class="font-value-mono text-primary">5.0s</span>
+</div>
+<input class="w-full" max="10" min="0.1" step="0.1" style="touch-action: manipulation;" type="range" value="5"/>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-center px-1">
+<span class="font-label-sm text-on-surface-variant uppercase text-[10px]">TEXT COLOR</span>
+<span class="font-value-mono text-primary text-[10px]">#FFFFFF</span>
+</div>
+<input class="w-full" max="360" min="0" style="touch-action: manipulation;" type="range" value="0"/>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-center px-1">
+<span class="font-label-sm text-on-surface-variant uppercase text-[10px]">BG COLOR</span>
+<span class="font-value-mono text-primary text-[10px]">#000000</span>
+</div>
+<input class="w-full" max="360" min="0" style="touch-action: manipulation;" type="range" value="180"/>
+</div>
+<button class="flex items-center justify-center gap-2 h-10 w-full bg-primary text-on-primary hover:bg-opacity-90 transition-colors mt-2">
+<span class="material-symbols-outlined text-[18px]">videocam</span>
+<span class="font-label-sm uppercase font-bold whitespace-nowrap text-[11px]">Сахрабитстр видев</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Additional Control Sections (Mixer, Presets, Library) -->
+<div class="flex flex-col border-b border-outline-variant">
+<button class="w-full flex items-center justify-between px-panel-padding py-4 hover:bg-surface-container-high transition-colors group text-left" onclick="toggleAccordion('mixer')">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[18px] text-primary">tune</span>
+<span class="font-section-header text-section-header uppercase">Mixer</span>
+</div>
+<span class="chevron-icon material-symbols-outlined text-on-surface-variant text-[18px]" id="chevron-mixer">expand_more</span>
+</button>
+<div class="accordion-content" id="content-mixer">
+<div class="accordion-inner">
+<div class="px-panel-padding py-4 border-t border-outline-variant text-on-surface-variant text-body-md opacity-60 italic">
+                        Mixing controls are currently inactive.
+                    </div>
+</div>
+</div>
+</div>
+<div class="flex flex-col border-b border-outline-variant">
+<button class="w-full flex items-center justify-between px-panel-padding py-4 hover:bg-surface-container-high transition-colors group text-left" onclick="toggleAccordion('presets')">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-primary">style</span>
+<span class="font-section-header text-section-header uppercase">Presets</span>
+</div>
+<span class="chevron-icon material-symbols-outlined text-on-surface-variant text-[18px]" id="chevron-presets">expand_more</span>
+</button>
+<div class="accordion-content" id="content-presets">
+<div class="accordion-inner">
+<div class="px-panel-padding py-4 border-t border-outline-variant flex flex-wrap gap-2">
+<div class="px-3 py-1 bg-surface-container-high border border-outline-variant text-[10px] uppercase cursor-pointer hover:border-primary">Studio A</div>
+<div class="px-3 py-1 bg-surface-container-high border border-outline-variant text-[10px] uppercase cursor-pointer hover:border-primary">Night Mode</div>
+<div class="px-3 py-1 bg-surface-container-high border border-outline-variant text-[10px] uppercase cursor-pointer hover:border-primary">Neon Glow</div>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col border-b border-outline-variant">
+<button class="w-full flex items-center justify-between px-panel-padding py-4 hover:bg-surface-container-high transition-colors group text-left" onclick="toggleAccordion('library')">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-primary">photo_library</span>
+<span class="font-section-header text-section-header uppercase">Library</span>
+</div>
+<span class="chevron-icon material-symbols-outlined text-on-surface-variant text-[18px]" id="chevron-library">expand_more</span>
+</button>
+<div class="accordion-content" id="content-library">
+<div class="accordion-inner">
+<div class="px-panel-padding py-4 border-t border-outline-variant">
+<div class="grid grid-cols-3 gap-1">
+<div class="aspect-square bg-surface-container-highest border border-outline-variant"></div>
+<div class="aspect-square bg-surface-container-highest border border-outline-variant"></div>
+<div class="aspect-square bg-surface-container-highest border border-outline-variant"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Navigation Links at bottom of sidebar (Now redundant but kept for layout consistency as requested) -->
+<div class="px-panel-padding py-2 flex flex-col gap-gutter mt-auto shrink-0 bg-surface-container-low opacity-0 pointer-events-none">
+<!-- Hidden spacer to maintain scroll area height if needed -->
+<div class="p-2 h-10"></div>
+</div>
+</aside>
+</main>
+<script>
+    const ledPanel = document.getElementById('led-panel');
+    const tempSlider = document.getElementById('temp-slider');
+    const hueSlider = document.getElementById('hue-slider');
+    const brightSlider = document.getElementById('bright-slider');
+    
+    const tempVal = document.getElementById('temp-val');
+    const hueVal = document.getElementById('hue-val');
+    const brightVal = document.getElementById('bright-val');
+
+    const btnStrobe = document.getElementById('btn-strobe');
+    const btnBlink = document.getElementById('btn-blink');
+
+    // Refined Accordion Logic
+    function toggleAccordion(id) {
+        const content = document.getElementById('content-' + id);
+        const chevron = document.getElementById('chevron-' + id);
+        
+        if (content && chevron) {
+            const isCollapsed = content.classList.contains('collapsed');
+            
+            // Toggle classes
+            if (isCollapsed) {
+                content.classList.remove('collapsed');
+                chevron.classList.remove('collapsed');
+            } else {
+                content.classList.add('collapsed');
+                chevron.classList.add('collapsed');
+            }
+        }
+    }
+
+    // Initialize initial state (some collapsed by default to show functionality)
+    window.addEventListener('DOMContentLoaded', () => {
+        ['mixer', 'presets', 'library'].forEach(id => {
+            const content = document.getElementById('content-' + id);
+            const chevron = document.getElementById('chevron-' + id);
+            if(content && chevron) {
+                content.classList.add('collapsed');
+                chevron.classList.add('collapsed');
+            }
+        });
+    });
+
+    let isStrobe = false;
+    let isBlink = false;
+
+    function updateLED() {
+        const temp = parseInt(tempSlider.value);
+        const hue = parseInt(hueSlider.value);
+        const brightness = parseInt(brightSlider.value);
+
+        tempVal.textContent = temp;
+        hueVal.textContent = hue + '°';
+        brightVal.textContent = brightness + '%';
+
+        let color;
+        const saturation = temp; 
+        color = `hsl(${hue}, ${saturation}%, 50%)`;
+        
+        if (temp === 0) {
+            color = `hsl(0, 0%, 100%)`;
+        }
+
+        ledPanel.style.backgroundColor = color;
+        ledPanel.style.opacity = brightness / 100;
+        
+        const glowOpacity = (brightness / 100) * 0.5;
+        ledPanel.style.setProperty('--glow-color', color.replace('hsl', 'hsla').replace(')', `, ${glowOpacity})`));
+    }
+
+    tempSlider.addEventListener('input', updateLED);
+    hueSlider.addEventListener('input', updateLED);
+    brightSlider.addEventListener('input', updateLED);
+
+    btnStrobe.addEventListener('click', () => {
+        isStrobe = !isStrobe;
+        isBlink = false;
+        ledPanel.classList.remove('animate-blink');
+        btnBlink.classList.remove('bg-primary', 'text-on-primary');
+        
+        if (isStrobe) {
+            ledPanel.classList.add('animate-strobe');
+            btnStrobe.classList.add('bg-primary', 'text-on-primary');
+        } else {
+            ledPanel.classList.remove('animate-strobe');
+            btnStrobe.classList.remove('bg-primary', 'text-on-primary');
+        }
+    });
+
+    btnBlink.addEventListener('click', () => {
+        isBlink = !isBlink;
+        isStrobe = false;
+        ledPanel.classList.remove('animate-strobe');
+        btnStrobe.classList.remove('bg-primary', 'text-on-primary');
+
+        if (isBlink) {
+            ledPanel.classList.add('animate-blink');
+            btnBlink.classList.add('bg-primary', 'text-on-primary');
+        } else {
+            ledPanel.classList.remove('animate-blink');
+            btnBlink.classList.remove('bg-primary', 'text-on-primary');
+        }
+    });
+
+    updateLED();
+</script>
+</body></html>
