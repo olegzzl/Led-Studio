@@ -123,9 +123,9 @@
             right: 0;
             bottom: 0;
             pointer-events: none;
-            /* Сетка пикселей масштабируется вместе с экраном (для полноэкранного режима) */
-            background-image: radial-gradient(transparent 33.33%, rgba(19, 19, 19, 0.95) 50%);
-            background-size: calc(3px * var(--led-scale, 1)) calc(3px * var(--led-scale, 1));
+            /* Сетка пикселей имеет фиксированный размер для всех режимов экрана */
+            background-image: radial-gradient(transparent 1px, rgba(19, 19, 19, 0.95) 1.5px);
+            background-size: 3px 3px;
         }
     </style>
 </head>
