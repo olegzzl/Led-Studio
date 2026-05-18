@@ -150,7 +150,7 @@ function startCandlePreset() {
     }, 80);
 }
 
-// Preset 4: TV (ТВ) - Cold blue-purple cinematic lighting with sharp shifts and slow decay
+// Preset 4: TV (ТВ) - Cold blue-purple cinematic lighting with sharp shifts, rapid micro-flicker and slow decay
 function startTvPreset() {
     clearActivePreset();
     currentPreset = 'tv';
@@ -167,37 +167,56 @@ function startTvPreset() {
     presetInterval = setInterval(() => {
         const baseOpacity = brightSlider.value / 100;
         
-        // Randomly trigger sharp shifts (representing screen scene changes)
-        if (Math.random() < 0.04) {
+        // Randomly trigger sharp shifts representing cuts and fast movement (about once a second)
+        if (Math.random() < 0.08) {
             const type = Math.random();
-            if (type < 0.45) {
-                // Cool Light Blue
-                targetR = 180 + Math.random() * 40;
-                targetG = 210 + Math.random() * 40;
+            if (type < 0.35) {
+                // Cool Cinematic Blue/Cyan (Action scenes)
+                targetR = 120 + Math.random() * 80;
+                targetG = 160 + Math.random() * 70;
                 targetB = 255;
-            } else if (type < 0.8) {
-                // Sky Blue/Teal
-                targetR = 80 + Math.random() * 50;
-                targetG = 130 + Math.random() * 60;
-                targetB = 230 + Math.random() * 25;
+                targetOpacity = 0.4 + Math.random() * 0.6;
+            } else if (type < 0.60) {
+                // Sky Blue/Teal (Daylight scenes)
+                targetR = 60 + Math.random() * 70;
+                targetG = 110 + Math.random() * 80;
+                targetB = 210 + Math.random() * 45;
+                targetOpacity = 0.3 + Math.random() * 0.6;
+            } else if (type < 0.75) {
+                // Cozy Warm Amber/Orange reflection (Indoor scene cuts)
+                targetR = 200 + Math.random() * 55;
+                targetG = 110 + Math.random() * 70;
+                targetB = 50 + Math.random() * 60;
+                targetOpacity = 0.45 + Math.random() * 0.45;
+            } else if (type < 0.90) {
+                // Cinematic Dark/Shadows (Night scenes/Suspense)
+                targetR = 20 + Math.random() * 30;
+                targetG = 20 + Math.random() * 30;
+                targetB = 60 + Math.random() * 40;
+                targetOpacity = 0.15 + Math.random() * 0.3;
             } else {
-                // Indigo/Violet
-                targetR = 60 + Math.random() * 40;
-                targetG = 40 + Math.random() * 40;
-                targetB = 180 + Math.random() * 50;
+                // Bright flash (Camera flash, explosion, transition)
+                targetR = 240 + Math.random() * 15;
+                targetG = 240 + Math.random() * 15;
+                targetB = 255;
+                targetOpacity = 0.85 + Math.random() * 0.15;
             }
-            targetOpacity = 0.25 + Math.random() * 0.75;
         }
         
         // Linear interpolation to make transitions natural and slow down (decays smoothly)
-        curR += (targetR - curR) * 0.08;
-        curG += (targetG - curG) * 0.08;
-        curB += (targetB - curB) * 0.08;
-        curOpacity += (targetOpacity - curOpacity) * 0.07;
+        // We use faster interpolation (0.15 for colors, 0.12 for opacity) for sudden dramatic scene cuts
+        curR += (targetR - curR) * 0.15;
+        curG += (targetG - curG) * 0.15;
+        curB += (targetB - curB) * 0.15;
+        curOpacity += (targetOpacity - curOpacity) * 0.12;
+        
+        // Apply a rapid micro-flicker representing picture motion and camera jitter
+        const microFlicker = 0.85 + Math.random() * 0.22; // 85% to 107%
+        const finalOpacity = Math.max(0.05, Math.min(1.0, baseOpacity * curOpacity * microFlicker));
         
         ledPanel.style.backgroundColor = `rgb(${Math.round(curR)}, ${Math.round(curG)}, ${Math.round(curB)})`;
-        ledPanel.style.opacity = baseOpacity * curOpacity;
-        ledPanel.style.setProperty('--glow-color', `rgba(${Math.round(curR)}, ${Math.round(curG)}, ${Math.round(curB)}, ${baseOpacity * curOpacity * 0.5})`);
+        ledPanel.style.opacity = finalOpacity;
+        ledPanel.style.setProperty('--glow-color', `rgba(${Math.round(curR)}, ${Math.round(curG)}, ${Math.round(curB)}, ${finalOpacity * 0.5})`);
     }, 60);
 }
 
@@ -401,6 +420,11 @@ function updateMarqueeParams() {
     const container = document.getElementById('marquee-container');
     if (!scroller || !container) return;
     
+    // Text size slider
+    const textSize = parseInt(document.getElementById('marquee-text-size-slider').value);
+    document.getElementById('marquee-text-size-val').textContent = textSize + 'px';
+    scroller.style.fontSize = textSize + 'px';
+    
     // Text color slider
     const textHue = parseInt(document.getElementById('marquee-text-color-slider').value);
     let textColor;
@@ -471,7 +495,8 @@ function saveMarqueeVideo() {
         saveBtn.disabled = false;
     };
     
-    // Read current colors
+    // Read current colors and size
+    const textSize = parseInt(document.getElementById('marquee-text-size-slider').value);
     const textHue = parseInt(document.getElementById('marquee-text-color-slider').value);
     const textColor = textHue === 0 ? '#FFFFFF' : `hsl(${textHue}, 100%, 50%)`;
     
@@ -493,14 +518,14 @@ function saveMarqueeVideo() {
         
         // 2. Draw text
         ctx.fillStyle = textColor;
-        ctx.font = "900 80px 'Outfit', 'Inter', sans-serif";
+        ctx.font = "900 " + textSize + "px 'Outfit', 'Inter', sans-serif";
         ctx.textBaseline = "middle";
         ctx.fillText(textInput.toUpperCase(), x, canvas.height / 2);
         
         // 3. Draw LED Dot Grid Overlay
         ctx.fillStyle = "rgba(19, 19, 19, 0.95)";
         const dotSpacing = 6;
-        const dotRadius = 2.0;
+        const dotRadius = 2.6; // Increased from 2.0 to make pixels larger and brighter
         
         for (let py = 0; py < canvas.height; py += dotSpacing) {
             for (let px = 0; px < canvas.width; px += dotSpacing) {
@@ -597,6 +622,7 @@ document.getElementById('btn-marquee-start').addEventListener('click', startMarq
 document.getElementById('btn-marquee-stop').addEventListener('click', stopMarquee);
 
 document.getElementById('marquee-speed-slider').addEventListener('input', updateMarqueeParams);
+document.getElementById('marquee-text-size-slider').addEventListener('input', updateMarqueeParams);
 document.getElementById('marquee-text-color-slider').addEventListener('input', updateMarqueeParams);
 document.getElementById('marquee-bg-color-slider').addEventListener('input', updateMarqueeParams);
 
