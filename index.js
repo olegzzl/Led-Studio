@@ -676,7 +676,7 @@ ledPanel.addEventListener('dblclick', toggleFullscreen);
 
 // Custom double-tap gesture on mobile to prevent iOS double-tap-to-zoom issues and guarantee responsiveness
 let lastTapTime = 0;
-ledPanel.addEventListener('touchend', (e) => {
+ledPanel.addEventListener('touchstart', (e) => {
     // Ignore touches inside the control panel
     if (asideElement && asideElement.contains(e.target)) return;
 
@@ -687,7 +687,7 @@ ledPanel.addEventListener('touchend', (e) => {
         toggleFullscreen();
     }
     lastTapTime = currentTime;
-});
+}, { passive: false });
 
 document.addEventListener('fullscreenchange', () => {
     if (!document.fullscreenElement && asideParent && asideElement) {
