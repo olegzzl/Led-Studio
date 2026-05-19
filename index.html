@@ -1709,8 +1709,8 @@
         document.addEventListener('mouseup', () => { setTimeout(() => { isDraggingInsideAside = false; }, 0); });
         document.addEventListener('touchend', () => { setTimeout(() => { isDraggingInsideAside = false; }, 0); });
 
-        // Double-click to toggle fullscreen mode
-        ledPanel.addEventListener('dblclick', () => {
+        // Reusable function to toggle fullscreen and update layout
+        function toggleFullscreen() {
             if (!document.fullscreenElement) {
                 ledPanel.requestFullscreen().then(() => {
                     asideParent = asideElement.parentNode;
@@ -1720,7 +1720,6 @@
                     asideElement.style.top = '0';
                     asideElement.style.height = '100%';
                     asideElement.style.zIndex = '1000';
-                    asideElement.style.display = 'flex'; // Visible by default on enter, or maybe hidden? user said: a single tap reveals.
                     asideElement.style.display = 'none'; // Hidden initially
                     ledPanel.appendChild(asideElement);
                 }).catch(err => {
@@ -1729,6 +1728,24 @@
             } else {
                 document.exitFullscreen();
             }
+        }
+
+        // Double-click to toggle fullscreen mode
+        ledPanel.addEventListener('dblclick', toggleFullscreen);
+
+        // Custom double-tap gesture on mobile to prevent iOS double-tap-to-zoom issues and guarantee responsiveness
+        let lastTapTime = 0;
+        ledPanel.addEventListener('touchend', (e) => {
+            // Ignore touches inside the control panel
+            if (asideElement && asideElement.contains(e.target)) return;
+
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTapTime;
+            if (tapLength < 300 && tapLength > 0) {
+                e.preventDefault(); // Stop iOS zoom or duplicate events
+                toggleFullscreen();
+            }
+            lastTapTime = currentTime;
         });
 
         document.addEventListener('fullscreenchange', () => {

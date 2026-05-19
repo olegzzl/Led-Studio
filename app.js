@@ -675,8 +675,7 @@ if (asideElement) {
 document.addEventListener('mouseup', () => { setTimeout(() => { isDraggingInsideAside = false; }, 0); });
 document.addEventListener('touchend', () => { setTimeout(() => { isDraggingInsideAside = false; }, 0); });
 
-// Double-click to toggle fullscreen mode
-ledPanel.addEventListener('dblclick', () => {
+function toggleFullscreen() {
     if (!document.fullscreenElement) {
         ledPanel.requestFullscreen().then(() => {
             if (asideElement) {
@@ -696,6 +695,24 @@ ledPanel.addEventListener('dblclick', () => {
     } else {
         document.exitFullscreen();
     }
+}
+
+// Double-click to toggle fullscreen mode
+ledPanel.addEventListener('dblclick', toggleFullscreen);
+
+// Custom double-tap gesture on mobile to prevent iOS double-tap-to-zoom issues and guarantee responsiveness
+let lastTapTime = 0;
+ledPanel.addEventListener('touchend', (e) => {
+    // Ignore touches inside the control panel
+    if (asideElement && asideElement.contains(e.target)) return;
+
+    const currentTime = new Date().getTime();
+    const tapLength = currentTime - lastTapTime;
+    if (tapLength < 300 && tapLength > 0) {
+        e.preventDefault(); // Stop iOS zoom or duplicate events
+        toggleFullscreen();
+    }
+    lastTapTime = currentTime;
 });
 
 document.addEventListener('fullscreenchange', () => {
