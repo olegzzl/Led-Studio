@@ -176,10 +176,10 @@
     <main class="flex flex-col flex-1 relative md:flex-row h-[calc(100vh-48px)] overflow-hidden">
         <!-- Main Viewport: LED Display -->
         <section
-            class="flex-1 flex flex-col items-center justify-center p-8 md:p-12 lg:p-24 bg-background relative overflow-y-auto">
+            class="w-full h-[35vh] md:h-auto shrink-0 md:flex-1 flex flex-col items-center justify-center p-4 md:p-12 lg:p-24 bg-background relative z-10">
             <div class="w-full max-w-3xl aspect-video rounded-lg border border-outline-variant relative overflow-hidden cursor-pointer"
                 id="led-panel" style="background-color: #FFFFFF;"></div>
-            <div data-translate="fullscreen-hint" class="mt-3 text-on-surface-variant font-label-sm text-[8px] text-center opacity-50 select-none max-w-lg cursor-default"
+            <div data-translate="fullscreen-hint" class="hidden md:block mt-3 text-on-surface-variant font-label-sm text-[8px] text-center opacity-50 select-none max-w-lg cursor-default"
                 id="fullscreen-hint">
                 Double-click for fullscreen. Double-click again to exit.
             </div>
@@ -195,7 +195,7 @@
 
         <!-- Right Sidebar (Controls) -->
         <aside
-            class="w-full md:w-sidebar-width bg-surface-container-low border-t md:border-t-0 md:border-l border-outline-variant flex flex-col h-full overflow-y-auto shrink-0">
+            class="w-full flex-1 md:w-[320px] lg:w-[360px] md:shrink-0 bg-surface-container-low border-t md:border-t-0 md:border-l border-outline-variant flex flex-col overflow-y-auto">
 
             <!-- Adjustments Section -->
             <div class="flex flex-col border-b border-outline-variant">
@@ -454,6 +454,7 @@
                                     <div class="flex items-center justify-between">
                                         <div class="text-[9px] text-outline font-section-header uppercase tracking-wider" data-translate="playlist-header">Playlist</div>
                                         <input type="file" id="audio-file-input" accept="audio/*" class="hidden" multiple />
+                                        <input type="file" id="audio-folder-input" accept="audio/*" class="hidden" webkitdirectory directory multiple />
                                     </div>
                                     <div id="player-playlist" class="flex flex-col max-h-[220px] overflow-y-auto pr-1 bg-black border border-outline-variant rounded p-1.5 font-mono text-[10px] space-y-0.5">
                                         <!-- Will be filled dynamically by JavaScript -->
@@ -592,7 +593,8 @@
         const dataArray = new Uint8Array(analyser.frequencyBinCount);
         const sourceFile = audioCtx.createMediaElementSource(audioPlayer);
         sourceFile.connect(analyser);
-        analyser.connect(audioCtx.destination);
+        // Connect music to speakers
+        sourceFile.connect(audioCtx.destination); 
         let sourceMic = null;
 
         // Multi-language Translation Engine (EN, RU, UA)
@@ -634,7 +636,8 @@
                 "save-video-btn": "Save Video",
                 "fullscreen-hint": "Double-click for fullscreen. Double-click again to exit.",
                 "playlist-header": "Playlist",
-                "add-track-item": "Add Track..."
+                "add-track-item": "Add Tracks",
+                "add-folder-item": "Add Folder"
             },
             ru: {
                 "adjustments-header": "Настройки",
@@ -671,7 +674,8 @@
                 "save-video-btn": "Сохранить видео",
                 "fullscreen-hint": "Дважды кликните для полноэкранного режима. Чтобы выйти, дважды кликните по экрану.",
                 "playlist-header": "Плейлист",
-                "add-track-item": "Добавить трек..."
+                "add-track-item": "Треки",
+                "add-folder-item": "Папку"
             },
             ua: {
                 "adjustments-header": "Налаштування",
@@ -708,7 +712,8 @@
                 "save-video-btn": "Зберегти відео",
                 "fullscreen-hint": "Двічі клікніть для повного екрану. Щоб вийти з повного екрану, двічі клікніть по екрану.",
                 "playlist-header": "Плейлист",
-                "add-track-item": "Додати трек..."
+                "add-track-item": "Треки",
+                "add-folder-item": "Папку"
             }
         };
 
@@ -1539,8 +1544,10 @@
         // Start Equalizer Mode
         function startEqualizerMode(mode) {
             if (typeof mode !== 'string') mode = activeEqMode;
-            clearActivePreset();
-            equalizerActive = true;
+            if (!equalizerActive) {
+                clearActivePreset();
+                equalizerActive = true;
+            }
             activeEqMode = mode;
 
             const config = PLANETS[mode] || PLANETS.earth;
@@ -1770,6 +1777,7 @@
 
         // Setup Audio Player Event Listeners and Playlist management
         const audioFileInput = document.getElementById('audio-file-input');
+        const audioFolderInput = document.getElementById('audio-folder-input');
         const playerPlayBtn = document.getElementById('player-play-btn');
         const playerProgress = document.getElementById('player-progress');
         const playerVolume = document.getElementById('player-volume');
@@ -1830,28 +1838,53 @@
                 playlistContainer.appendChild(item);
             });
 
-            // "+ Add Track..." option at the bottom styled like a Winamp control
-            const addItem = document.createElement('div');
-            addItem.className = 'flex items-center justify-center gap-1.5 py-1 px-1.5 border border-dashed border-outline-variant hover:border-primary hover:bg-surface-container-high text-[#10b981]/80 hover:text-[#10b981] transition-colors text-[9px] mt-1.5 font-mono cursor-pointer';
+            // Buttons row at the bottom
+            const buttonsRow = document.createElement('div');
+            buttonsRow.className = 'flex gap-1.5 mt-1.5';
+
+            // "+ Add Track..."
+            const addTrackItem = document.createElement('div');
+            addTrackItem.className = 'flex-1 flex items-center justify-center gap-1.5 py-1 px-1.5 border border-dashed border-outline-variant hover:border-primary hover:bg-surface-container-high text-[#10b981]/80 hover:text-[#10b981] transition-colors text-[9px] font-mono cursor-pointer';
             
-            const addIcon = document.createElement('span');
-            addIcon.className = 'material-symbols-outlined text-[12px]';
-            addIcon.textContent = 'add';
+            const addTrackIcon = document.createElement('span');
+            addTrackIcon.className = 'material-symbols-outlined text-[12px]';
+            addTrackIcon.textContent = 'add_circle';
             
-            const addLabel = document.createElement('span');
-            addLabel.setAttribute('data-translate', 'add-track-item');
-            addLabel.textContent = translations[currentLang] && translations[currentLang]['add-track-item'] 
-                ? translations[currentLang]['add-track-item'] 
-                : 'Add Track...';
+            const addTrackLabel = document.createElement('span');
+            addTrackLabel.setAttribute('data-translate', 'add-track-item');
+            addTrackLabel.textContent = translations[currentLang] && translations[currentLang]['add-track-item'] ? translations[currentLang]['add-track-item'] : 'Add Tracks';
             
-            addItem.appendChild(addIcon);
-            addItem.appendChild(addLabel);
+            addTrackItem.appendChild(addTrackIcon);
+            addTrackItem.appendChild(addTrackLabel);
             
-            addItem.addEventListener('click', (e) => {
+            addTrackItem.addEventListener('click', (e) => {
                 e.preventDefault();
                 audioFileInput.click();
             });
-            playlistContainer.appendChild(addItem);
+
+            // "+ Add Folder..."
+            const addFolderItem = document.createElement('div');
+            addFolderItem.className = 'flex-1 flex items-center justify-center gap-1.5 py-1 px-1.5 border border-dashed border-outline-variant hover:border-primary hover:bg-surface-container-high text-[#10b981]/80 hover:text-[#10b981] transition-colors text-[9px] font-mono cursor-pointer';
+            
+            const addFolderIcon = document.createElement('span');
+            addFolderIcon.className = 'material-symbols-outlined text-[12px]';
+            addFolderIcon.textContent = 'create_new_folder';
+            
+            const addFolderLabel = document.createElement('span');
+            addFolderLabel.setAttribute('data-translate', 'add-folder-item');
+            addFolderLabel.textContent = translations[currentLang] && translations[currentLang]['add-folder-item'] ? translations[currentLang]['add-folder-item'] : 'Add Folder';
+            
+            addFolderItem.appendChild(addFolderIcon);
+            addFolderItem.appendChild(addFolderLabel);
+            
+            addFolderItem.addEventListener('click', (e) => {
+                e.preventDefault();
+                audioFolderInput.click();
+            });
+
+            buttonsRow.appendChild(addTrackItem);
+            buttonsRow.appendChild(addFolderItem);
+            playlistContainer.appendChild(buttonsRow);
         }
 
         // Remove track from playlist
@@ -1914,12 +1947,37 @@
             let firstNewIndex = playlist.length;
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
-                const url = URL.createObjectURL(file);
-                playlist.push({ name: file.name, url: url });
+                if (file.type.startsWith('audio/')) {
+                    const url = URL.createObjectURL(file);
+                    playlist.push({ name: file.name, url: url });
+                }
             }
             
             selectTrack(firstNewIndex);
         });
+
+        // Handle folder uploads
+        const audioFolderInput = document.getElementById('audio-folder-input');
+        if (audioFolderInput) {
+            audioFolderInput.addEventListener('change', function(e) {
+                const files = e.target.files;
+                if (!files || files.length === 0) return;
+
+                let firstNewIndex = playlist.length;
+                let added = false;
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    // Only pick audio files from the folder
+                    if (file.type.startsWith('audio/')) {
+                        const url = URL.createObjectURL(file);
+                        playlist.push({ name: file.name, url: url });
+                        added = true;
+                    }
+                }
+                
+                if (added) selectTrack(firstNewIndex);
+            });
+        }
 
         playerPlayBtn.addEventListener('click', function() {
             initAudio();
