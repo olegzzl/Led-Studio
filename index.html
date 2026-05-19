@@ -130,12 +130,27 @@
 
         /* Column-level vibration/jitter on peak signals */
         @keyframes eq-col-jitter {
-            0% { transform: translateY(0); }
-            25% { transform: translateY(-1.5px); }
-            50% { transform: translateY(1.5px); }
-            75% { transform: translateY(-1px); }
-            100% { transform: translateY(0); }
+            0% {
+                transform: translateY(0);
+            }
+
+            25% {
+                transform: translateY(-1.5px);
+            }
+
+            50% {
+                transform: translateY(1.5px);
+            }
+
+            75% {
+                transform: translateY(-1px);
+            }
+
+            100% {
+                transform: translateY(0);
+            }
         }
+
         .eq-column-vibrating {
             animation: eq-col-jitter 0.06s linear infinite;
         }
@@ -161,9 +176,12 @@
                 class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-surface-container-high p-1 transition-colors">settings</span>
             <!-- Language switcher buttons placed to the right of settings (gear) -->
             <div class="flex gap-1 bg-surface-container-low border border-outline-variant p-0.5 rounded">
-                <button onclick="changeLanguage('ua')" id="lang-btn-ua" class="px-2 py-0.5 text-[9px] font-bold uppercase cursor-pointer transition-colors rounded lang-btn text-on-surface-variant hover:bg-surface-container-high">UA</button>
-                <button onclick="changeLanguage('ru')" id="lang-btn-ru" class="px-2 py-0.5 text-[9px] font-bold uppercase cursor-pointer transition-colors rounded lang-btn text-on-surface-variant hover:bg-surface-container-high">RU</button>
-                <button onclick="changeLanguage('en')" id="lang-btn-en" class="px-2 py-0.5 text-[9px] font-bold uppercase cursor-pointer transition-colors rounded lang-btn active-lang bg-primary text-on-primary">EN</button>
+                <button onclick="changeLanguage('ua')" id="lang-btn-ua"
+                    class="px-2 py-0.5 text-[9px] font-bold uppercase cursor-pointer transition-colors rounded lang-btn text-on-surface-variant hover:bg-surface-container-high">UA</button>
+                <button onclick="changeLanguage('ru')" id="lang-btn-ru"
+                    class="px-2 py-0.5 text-[9px] font-bold uppercase cursor-pointer transition-colors rounded lang-btn text-on-surface-variant hover:bg-surface-container-high">RU</button>
+                <button onclick="changeLanguage('en')" id="lang-btn-en"
+                    class="px-2 py-0.5 text-[9px] font-bold uppercase cursor-pointer transition-colors rounded lang-btn active-lang bg-primary text-on-primary">EN</button>
             </div>
             <span
                 class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-surface-container-high p-1 transition-colors">info</span>
@@ -178,7 +196,8 @@
             class="w-full h-[35vh] shrink-0 md:w-auto md:h-auto md:flex-1 flex flex-col items-center justify-center p-4 md:p-12 lg:p-24 bg-background relative z-10 md:overflow-y-auto">
             <div class="w-full max-w-3xl aspect-video rounded-lg border border-outline-variant relative overflow-hidden cursor-pointer"
                 id="led-panel" style="background-color: #FFFFFF;"></div>
-            <div data-translate="fullscreen-hint" class="hidden md:block mt-3 text-on-surface-variant font-label-sm text-[8px] text-center opacity-50 select-none max-w-lg cursor-default"
+            <div data-translate="fullscreen-hint"
+                class="hidden md:block mt-3 text-on-surface-variant font-label-sm text-[8px] text-center opacity-50 select-none max-w-lg cursor-default"
                 id="fullscreen-hint">
                 Double-click for fullscreen. Double-click again to exit.
             </div>
@@ -196,17 +215,27 @@
         <aside
             class="w-full flex-1 md:w-sidebar-width bg-surface-container-low border-t md:border-t-0 md:border-l border-outline-variant flex flex-col md:flex-none md:h-full overflow-y-auto md:shrink-0">
 
+            <!-- Wake Lock / Отключение спящего режима -->
+            <div class="px-panel-padding py-4 border-b border-outline-variant bg-surface-container/30">
+                <button id="wake-lock-btn" data-translate="wake-lock-default"
+                    class="w-full h-10 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant font-label-sm uppercase tracking-widest text-[10px]">
+                    Отключить спящий режим
+                </button>
+            </div>
+
             <!-- Adjustments Section -->
             <div class="flex flex-col border-b border-outline-variant">
                 <button
                     class="w-full flex flex-col px-panel-padding py-4 hover:bg-surface-container-high transition-colors group text-left"
                     onclick="toggleAccordion('adjustments')">
                     <div class="flex justify-between items-center w-full">
-                        <span data-translate="adjustments-header" class="font-section-header text-section-header text-primary uppercase">Adjustments</span>
+                        <span data-translate="adjustments-header"
+                            class="font-section-header text-section-header text-primary uppercase">Adjustments</span>
                         <span class="chevron-icon material-symbols-outlined text-on-surface-variant text-[18px]"
                             id="chevron-adjustments">expand_more</span>
                     </div>
-                    <div data-translate="master-control" class="text-[9px] text-outline tracking-widest mt-1">MASTER_CONTROL</div>
+                    <div data-translate="master-control" class="text-[9px] text-outline tracking-widest mt-1">
+                        MASTER_CONTROL</div>
                 </button>
                 <div class="accordion-content" id="content-adjustments">
                     <div class="accordion-inner">
@@ -214,12 +243,14 @@
                         <div class="px-panel-padding py-4 border-t border-outline-variant">
                             <div class="flex items-center gap-2 mb-3">
                                 <span class="text-[8px] transform rotate-90 text-on-surface-variant">▲</span>
-                                <span data-translate="white-balance" class="font-section-header text-section-header uppercase">White Balance</span>
+                                <span data-translate="white-balance"
+                                    class="font-section-header text-section-header uppercase">White Balance</span>
                             </div>
                             <div class="space-y-4">
                                 <div class="flex flex-col gap-1">
                                     <div class="flex justify-between items-center px-1">
-                                        <span data-translate="temp-label" class="font-label-sm text-on-surface-variant uppercase text-[10px]">Temp</span>
+                                        <span data-translate="temp-label"
+                                            class="font-label-sm text-on-surface-variant uppercase text-[10px]">Temp</span>
                                         <span class="font-value-mono text-primary text-[10px]" id="temp-val">0</span>
                                     </div>
                                     <input class="w-full" id="temp-slider" max="100" min="0"
@@ -227,17 +258,19 @@
                                 </div>
                             </div>
                         </div>
- 
+
                         <!-- Hue & Intensity -->
                         <div class="px-panel-padding py-4 border-t border-outline-variant">
                             <div class="flex items-center gap-2 mb-3">
                                 <span class="text-[8px] transform rotate-90 text-on-surface-variant">▲</span>
-                                <span data-translate="hue-intensity" class="font-section-header text-section-header uppercase">Hue &amp; Intensity</span>
+                                <span data-translate="hue-intensity"
+                                    class="font-section-header text-section-header uppercase">Hue &amp; Intensity</span>
                             </div>
                             <div class="space-y-4">
                                 <div class="flex flex-col gap-1">
                                     <div class="flex justify-between items-center px-1">
-                                        <span data-translate="spectrum-label" class="font-label-sm text-on-surface-variant uppercase text-[10px]">Spectrum</span>
+                                        <span data-translate="spectrum-label"
+                                            class="font-label-sm text-on-surface-variant uppercase text-[10px]">Spectrum</span>
                                         <span class="font-value-mono text-primary text-[10px]" id="hue-val">0°</span>
                                     </div>
                                     <input class="w-full" id="hue-slider" max="360" min="0"
@@ -245,8 +278,10 @@
                                 </div>
                                 <div class="flex flex-col gap-1">
                                     <div class="flex justify-between items-center px-1">
-                                        <span data-translate="brightness-label" class="font-label-sm text-on-surface-variant uppercase text-[10px]">Brightness</span>
-                                        <span class="font-value-mono text-primary text-[10px]" id="bright-val">80%</span>
+                                        <span data-translate="brightness-label"
+                                            class="font-label-sm text-on-surface-variant uppercase text-[10px]">Brightness</span>
+                                        <span class="font-value-mono text-primary text-[10px]"
+                                            id="bright-val">80%</span>
                                     </div>
                                     <input class="w-full" id="bright-slider" max="100" min="0"
                                         style="touch-action: manipulation;" type="range" value="80" />
@@ -263,14 +298,16 @@
                                     id="btn-strobe">
                                     <span
                                         class="material-symbols-outlined text-[20px] group-hover:text-primary">flash_on</span>
-                                    <span data-translate="strobe-btn" class="font-label-sm uppercase text-[10px]">Strobe</span>
+                                    <span data-translate="strobe-btn"
+                                        class="font-label-sm uppercase text-[10px]">Strobe</span>
                                 </button>
                                 <button
                                     class="flex flex-col items-center justify-center gap-1 h-16 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant group"
                                     id="btn-blink">
                                     <span
                                         class="material-symbols-outlined text-[20px] group-hover:text-primary">timer_10_alt_1</span>
-                                    <span data-translate="blink-btn" class="font-label-sm uppercase text-[10px]">Blink</span>
+                                    <span data-translate="blink-btn"
+                                        class="font-label-sm uppercase text-[10px]">Blink</span>
                                 </button>
                             </div>
                             <div class="grid gap-2 grid-cols-2">
@@ -289,14 +326,15 @@
                     </div>
                 </div>
             </div>
- 
+
             <!-- Marquee Control Block -->
             <div class="flex flex-col border-b border-outline-variant">
                 <button
                     class="w-full flex items-center justify-between px-panel-padding py-4 hover:bg-surface-container-high transition-colors group text-left bg-surface-container/30"
                     onclick="toggleAccordion('marquee')">
                     <div class="flex items-center gap-2">
-                        <span data-translate="marquee-header" class="font-section-header text-section-header uppercase">Marquee Control</span>
+                        <span data-translate="marquee-header"
+                            class="font-section-header text-section-header uppercase">Marquee Control</span>
                     </div>
                     <span class="chevron-icon material-symbols-outlined text-on-surface-variant text-[18px] collapsed"
                         id="chevron-marquee">expand_more</span>
@@ -306,14 +344,16 @@
                         <div class="px-panel-padding py-4 border-t border-outline-variant">
                             <div class="space-y-5">
                                 <div class="flex flex-col gap-1.5">
-                                    <span
-                                        data-translate="marquee-msg" class="font-label-sm text-on-surface-variant uppercase text-[10px] px-1">Message</span>
+                                    <span data-translate="marquee-msg"
+                                        class="font-label-sm text-on-surface-variant uppercase text-[10px] px-1">Message</span>
                                     <div id="marquee-inputs-container" class="space-y-2">
                                         <div class="flex gap-1.5 items-center">
                                             <input
                                                 class="marquee-input-line bg-surface-container-low text-primary border border-outline-variant font-body-md px-2 py-1.5 focus:border-primary outline-none flex-1"
                                                 placeholder="Enter text..." type="text" value="Led Studio" />
-                                            <button type="button" class="btn-add-line flex items-center justify-center w-8 h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-primary rounded shrink-0" onclick="addMarqueeLine()">
+                                            <button type="button"
+                                                class="btn-add-line flex items-center justify-center w-8 h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-primary rounded shrink-0"
+                                                onclick="addMarqueeLine()">
                                                 <span class="material-symbols-outlined text-[18px]">add</span>
                                             </button>
                                         </div>
@@ -321,32 +361,37 @@
                                             <input
                                                 class="marquee-input-line bg-surface-container-low text-primary border border-outline-variant font-body-md px-2 py-1.5 focus:border-primary outline-none flex-1"
                                                 placeholder="Enter text..." type="text" value="❤️" />
-                                            <button type="button" class="btn-remove-line flex items-center justify-center w-8 h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-error rounded shrink-0" onclick="removeMarqueeLine(this)">
+                                            <button type="button"
+                                                class="btn-remove-line flex items-center justify-center w-8 h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-error rounded shrink-0"
+                                                onclick="removeMarqueeLine(this)">
                                                 <span class="material-symbols-outlined text-[18px]">remove</span>
                                             </button>
                                         </div>
                                     </div>
                                     <div class="flex gap-2 mt-1">
-                                        <button
-                                            data-translate="play-btn" class="flex-1 h-[28px] border border-outline-variant bg-surface-container-high text-primary font-label-sm uppercase hover:bg-surface-bright transition-colors text-[10px]"
+                                        <button data-translate="play-btn"
+                                            class="flex-1 h-[28px] border border-outline-variant bg-surface-container-high text-primary font-label-sm uppercase hover:bg-surface-bright transition-colors text-[10px]"
                                             id="btn-marquee-start">Play</button>
-                                        <button
-                                            data-translate="stop-btn" class="flex-1 h-[28px] border border-outline-variant text-on-surface-variant font-label-sm uppercase hover:bg-surface-container-high transition-colors text-[10px]"
+                                        <button data-translate="stop-btn"
+                                            class="flex-1 h-[28px] border border-outline-variant text-on-surface-variant font-label-sm uppercase hover:bg-surface-container-high transition-colors text-[10px]"
                                             id="btn-marquee-stop">Stop</button>
                                     </div>
                                 </div>
                                 <div class="flex flex-col gap-1">
                                     <div class="flex justify-between items-center px-1">
-                                        <span
-                                            data-translate="speed-label" class="font-label-sm text-on-surface-variant uppercase text-[10px]">Speed</span>
-                                        <span class="font-value-mono text-primary text-[10px]" id="marquee-speed-val">2.0x</span>
+                                        <span data-translate="speed-label"
+                                            class="font-label-sm text-on-surface-variant uppercase text-[10px]">Speed</span>
+                                        <span class="font-value-mono text-primary text-[10px]"
+                                            id="marquee-speed-val">2.0x</span>
                                     </div>
                                     <input class="w-full" id="marquee-speed-slider" max="10" min="1" step="0.5"
                                         style="touch-action: manipulation;" type="range" value="2.0" />
                                 </div>
                                 <div class="flex flex-col gap-1">
                                     <div class="flex justify-between items-center px-1">
-                                        <span data-translate="size-label" class="font-label-sm text-on-surface-variant uppercase text-[10px]">Text Size</span>
+                                        <span data-translate="size-label"
+                                            class="font-label-sm text-on-surface-variant uppercase text-[10px]">Text
+                                            Size</span>
                                         <span class="font-value-mono text-primary text-[10px]"
                                             id="marquee-text-size-val">37px</span>
                                     </div>
@@ -355,7 +400,9 @@
                                 </div>
                                 <div class="flex flex-col gap-1">
                                     <div class="flex justify-between items-center px-1">
-                                        <span data-translate="color-label" class="font-label-sm text-on-surface-variant uppercase text-[10px]">TEXT COLOR</span>
+                                        <span data-translate="color-label"
+                                            class="font-label-sm text-on-surface-variant uppercase text-[10px]">TEXT
+                                            COLOR</span>
                                         <span class="font-value-mono text-primary text-[10px]"
                                             id="marquee-text-color-val">HSL 167°</span>
                                     </div>
@@ -364,7 +411,8 @@
                                 </div>
                                 <div class="flex gap-2 mt-2">
                                     <div class="flex flex-col gap-1 w-[80px] shrink-0">
-                                        <select id="marquee-video-duration" class="h-10 bg-surface-container-low text-primary border border-outline-variant font-label-sm text-[11px] uppercase px-2 outline-none cursor-pointer focus:border-primary w-full">
+                                        <select id="marquee-video-duration"
+                                            class="h-10 bg-surface-container-low text-primary border border-outline-variant font-label-sm text-[11px] uppercase px-2 outline-none cursor-pointer focus:border-primary w-full">
                                             <option value="5">5s</option>
                                             <option value="10">10s</option>
                                             <option value="15" selected>15s</option>
@@ -376,7 +424,8 @@
                                         id="btn-marquee-save-video">
                                         <span class="material-symbols-outlined text-[18px]">videocam</span>
                                         <span data-translate="save-video-btn"
-                                            class="font-label-sm uppercase font-bold whitespace-nowrap text-[11px]">Save Video</span>
+                                            class="font-label-sm uppercase font-bold whitespace-nowrap text-[11px]">Save
+                                            Video</span>
                                     </button>
                                 </div>
                             </div>
@@ -392,7 +441,8 @@
                     onclick="toggleAccordion('equalizer')">
                     <div class="flex items-center gap-3">
                         <span class="material-symbols-outlined text-[18px] text-primary">equalizer</span>
-                        <span data-translate="equalizer-header" class="font-section-header text-section-header uppercase">Equalizer</span>
+                        <span data-translate="equalizer-header"
+                            class="font-section-header text-section-header uppercase">Equalizer</span>
                     </div>
                     <span class="chevron-icon material-symbols-outlined text-on-surface-variant text-[18px] collapsed"
                         id="chevron-equalizer">expand_more</span>
@@ -402,60 +452,86 @@
                         <div class="px-panel-padding py-4 border-t border-outline-variant space-y-4">
                             <!-- Equalizer Planet Themes -->
                             <div class="grid gap-1.5 grid-cols-4 mt-2">
-                                <button id="btn-eq-earth" onclick="startEqualizerMode('earth')" class="eq-mode-btn h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant font-label-sm uppercase text-[9px]">Earth</button>
-                                <button id="btn-eq-mars" onclick="startEqualizerMode('mars')" class="eq-mode-btn h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant font-label-sm uppercase text-[9px]">Mars</button>
-                                <button id="btn-eq-jupiter" onclick="startEqualizerMode('jupiter')" class="eq-mode-btn h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant font-label-sm uppercase text-[9px]">Jupiter</button>
-                                <button id="btn-eq-saturn" onclick="startEqualizerMode('saturn')" class="eq-mode-btn h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant font-label-sm uppercase text-[9px]">Saturn</button>
-                                <button id="btn-eq-venus" onclick="startEqualizerMode('venus')" class="eq-mode-btn h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant font-label-sm uppercase text-[9px]">Venus</button>
-                                <button id="btn-eq-neptune" onclick="startEqualizerMode('neptune')" class="eq-mode-btn h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant font-label-sm uppercase text-[9px]">Neptune</button>
-                                <button id="btn-eq-pluto" onclick="startEqualizerMode('pluto')" class="eq-mode-btn h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant font-label-sm uppercase text-[9px]">Pluto</button>
-                                <button id="btn-eq-uranus" onclick="startEqualizerMode('uranus')" class="eq-mode-btn h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant font-label-sm uppercase text-[9px]">Uranus</button>
+                                <button id="btn-eq-earth" onclick="startEqualizerMode('earth')"
+                                    class="eq-mode-btn h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant font-label-sm uppercase text-[9px]">Earth</button>
+                                <button id="btn-eq-mars" onclick="startEqualizerMode('mars')"
+                                    class="eq-mode-btn h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant font-label-sm uppercase text-[9px]">Mars</button>
+                                <button id="btn-eq-jupiter" onclick="startEqualizerMode('jupiter')"
+                                    class="eq-mode-btn h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant font-label-sm uppercase text-[9px]">Jupiter</button>
+                                <button id="btn-eq-saturn" onclick="startEqualizerMode('saturn')"
+                                    class="eq-mode-btn h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant font-label-sm uppercase text-[9px]">Saturn</button>
+                                <button id="btn-eq-venus" onclick="startEqualizerMode('venus')"
+                                    class="eq-mode-btn h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant font-label-sm uppercase text-[9px]">Venus</button>
+                                <button id="btn-eq-neptune" onclick="startEqualizerMode('neptune')"
+                                    class="eq-mode-btn h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant font-label-sm uppercase text-[9px]">Neptune</button>
+                                <button id="btn-eq-pluto" onclick="startEqualizerMode('pluto')"
+                                    class="eq-mode-btn h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant font-label-sm uppercase text-[9px]">Pluto</button>
+                                <button id="btn-eq-uranus" onclick="startEqualizerMode('uranus')"
+                                    class="eq-mode-btn h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant font-label-sm uppercase text-[9px]">Uranus</button>
                             </div>
                             <div class="mt-2">
-                                <button id="btn-mic-toggle" class="w-full flex items-center justify-center gap-2 h-10 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant font-label-sm uppercase text-[11px]">
+                                <button id="btn-mic-toggle"
+                                    class="w-full flex items-center justify-center gap-2 h-10 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant font-label-sm uppercase text-[11px]">
                                     <span class="material-symbols-outlined text-[18px]" id="mic-icon">mic_off</span>
                                     <span id="mic-btn-text" data-translate="mic-off-btn">Mic On</span>
                                 </button>
                             </div>
 
                             <!-- Custom Grid Settings -->
-                            <div class="border border-outline-variant p-3 bg-surface-container-low rounded space-y-3 mt-2">
-                                <div class="font-section-header text-[10px] tracking-wider text-outline uppercase">Custom Grid</div>
-                                
+                            <div
+                                class="border border-outline-variant p-3 bg-surface-container-low rounded space-y-3 mt-2">
+                                <div class="font-section-header text-[10px] tracking-wider text-outline uppercase">
+                                    Custom Grid</div>
+
                                 <div class="flex flex-col gap-1">
                                     <div class="flex justify-between items-center px-1">
-                                        <span class="font-label-sm text-on-surface-variant uppercase text-[10px]">Columns</span>
-                                        <span class="font-value-mono text-primary text-[10px]" id="eq-cols-val">20</span>
+                                        <span
+                                            class="font-label-sm text-on-surface-variant uppercase text-[10px]">Columns</span>
+                                        <span class="font-value-mono text-primary text-[10px]"
+                                            id="eq-cols-val">20</span>
                                     </div>
-                                    <input class="w-full" id="eq-cols-slider" max="64" min="4" step="1" type="range" value="20" />
+                                    <input class="w-full" id="eq-cols-slider" max="64" min="4" step="1" type="range"
+                                        value="20" />
                                 </div>
                                 <div class="flex flex-col gap-1">
                                     <div class="flex justify-between items-center px-1">
-                                        <span class="font-label-sm text-on-surface-variant uppercase text-[10px]">Rows</span>
-                                        <span class="font-value-mono text-primary text-[10px]" id="eq-rows-val">15</span>
+                                        <span
+                                            class="font-label-sm text-on-surface-variant uppercase text-[10px]">Rows</span>
+                                        <span class="font-value-mono text-primary text-[10px]"
+                                            id="eq-rows-val">15</span>
                                     </div>
-                                    <input class="w-full" id="eq-rows-slider" max="48" min="4" step="1" type="range" value="15" />
+                                    <input class="w-full" id="eq-rows-slider" max="48" min="4" step="1" type="range"
+                                        value="15" />
                                 </div>
                                 <div class="flex flex-col gap-1">
                                     <div class="flex justify-between items-center px-1">
-                                        <span class="font-label-sm text-on-surface-variant uppercase text-[10px]">Horizontal Gap</span>
-                                        <span class="font-value-mono text-primary text-[10px]" id="eq-col-gap-val">4px</span>
+                                        <span
+                                            class="font-label-sm text-on-surface-variant uppercase text-[10px]">Horizontal
+                                            Gap</span>
+                                        <span class="font-value-mono text-primary text-[10px]"
+                                            id="eq-col-gap-val">4px</span>
                                     </div>
-                                    <input class="w-full" id="eq-col-gap-slider" max="24" min="0" step="1" type="range" value="4" />
+                                    <input class="w-full" id="eq-col-gap-slider" max="24" min="0" step="1" type="range"
+                                        value="4" />
                                 </div>
                                 <div class="flex flex-col gap-1">
                                     <div class="flex justify-between items-center px-1">
-                                        <span class="font-label-sm text-on-surface-variant uppercase text-[10px]">Vertical Gap</span>
-                                        <span class="font-value-mono text-primary text-[10px]" id="eq-row-gap-val">3px</span>
+                                        <span
+                                            class="font-label-sm text-on-surface-variant uppercase text-[10px]">Vertical
+                                            Gap</span>
+                                        <span class="font-value-mono text-primary text-[10px]"
+                                            id="eq-row-gap-val">3px</span>
                                     </div>
-                                    <input class="w-full" id="eq-row-gap-slider" max="24" min="0" step="1" type="range" value="3" />
+                                    <input class="w-full" id="eq-row-gap-slider" max="24" min="0" step="1" type="range"
+                                        value="3" />
                                 </div>
                             </div>
 
                             <!-- Custom Audio Player Section -->
                             <div class="border border-outline-variant p-3 bg-surface-container-low rounded space-y-3">
-                                <div class="font-section-header text-[10px] tracking-wider text-outline uppercase">Audio Player</div>
-                                
+                                <div class="font-section-header text-[10px] tracking-wider text-outline uppercase">Audio
+                                    Player</div>
+
                                 <!-- Playing Song Info -->
                                 <div id="player-track-info" class="text-[11px] text-primary truncate hidden">
                                     No file loaded
@@ -464,43 +540,61 @@
                                 <!-- Custom Controls -->
                                 <div class="flex flex-col gap-2">
                                     <div class="flex items-center justify-center gap-3">
-                                        <button id="player-prev-btn" class="w-8 h-8 flex items-center justify-center border border-outline-variant hover:bg-surface-container-high transition-colors text-primary rounded" disabled>
+                                        <button id="player-prev-btn"
+                                            class="w-8 h-8 flex items-center justify-center border border-outline-variant hover:bg-surface-container-high transition-colors text-primary rounded"
+                                            disabled>
                                             <span class="material-symbols-outlined text-[18px]">skip_previous</span>
                                         </button>
-                                        <button id="player-play-btn" class="w-8 h-8 flex items-center justify-center border border-outline-variant hover:bg-surface-container-high transition-colors text-primary rounded" disabled>
+                                        <button id="player-play-btn"
+                                            class="w-8 h-8 flex items-center justify-center border border-outline-variant hover:bg-surface-container-high transition-colors text-primary rounded"
+                                            disabled>
                                             <span class="material-symbols-outlined text-[18px]">play_arrow</span>
                                         </button>
-                                        <button id="player-stop-btn" class="w-8 h-8 flex items-center justify-center border border-outline-variant hover:bg-surface-container-high transition-colors text-primary rounded" disabled>
+                                        <button id="player-stop-btn"
+                                            class="w-8 h-8 flex items-center justify-center border border-outline-variant hover:bg-surface-container-high transition-colors text-primary rounded"
+                                            disabled>
                                             <span class="material-symbols-outlined text-[18px]">stop</span>
                                         </button>
-                                        <button id="player-next-btn" class="w-8 h-8 flex items-center justify-center border border-outline-variant hover:bg-surface-container-high transition-colors text-primary rounded" disabled>
+                                        <button id="player-next-btn"
+                                            class="w-8 h-8 flex items-center justify-center border border-outline-variant hover:bg-surface-container-high transition-colors text-primary rounded"
+                                            disabled>
                                             <span class="material-symbols-outlined text-[18px]">skip_next</span>
                                         </button>
                                     </div>
-                                    
+
                                     <!-- Progress Bar -->
                                     <div class="flex items-center gap-2 w-full">
-                                        <span id="player-time-current" class="font-value-mono text-[9px] text-outline">0:00</span>
-                                        <input type="range" id="player-progress" min="0" max="100" value="0" class="flex-1 h-1" disabled />
-                                        <span id="player-time-total" class="font-value-mono text-[9px] text-outline">0:00</span>
+                                        <span id="player-time-current"
+                                            class="font-value-mono text-[9px] text-outline">0:00</span>
+                                        <input type="range" id="player-progress" min="0" max="100" value="0"
+                                            class="flex-1 h-1" disabled />
+                                        <span id="player-time-total"
+                                            class="font-value-mono text-[9px] text-outline">0:00</span>
                                     </div>
                                 </div>
-                                
+
                                 <!-- Volume Control -->
                                 <div class="flex items-center gap-2 px-1">
-                                    <span class="material-symbols-outlined text-[14px] text-on-surface-variant">volume_up</span>
-                                    <input type="range" id="player-volume" min="0" max="100" value="70" class="flex-1" />
-                                    <span id="player-volume-val" class="font-value-mono text-[10px] text-primary">70%</span>
+                                    <span
+                                        class="material-symbols-outlined text-[14px] text-on-surface-variant">volume_up</span>
+                                    <input type="range" id="player-volume" min="0" max="100" value="70"
+                                        class="flex-1" />
+                                    <span id="player-volume-val"
+                                        class="font-value-mono text-[10px] text-primary">70%</span>
                                 </div>
 
                                 <!-- Playlist Section -->
                                 <div class="mt-3 border-t border-outline-variant pt-3 space-y-2">
                                     <div class="flex items-center justify-between">
-                                        <div class="text-[9px] text-outline font-section-header uppercase tracking-wider" data-translate="playlist-header">Playlist</div>
-                                        <input type="file" id="audio-file-input" accept="audio/*" class="hidden" multiple />
-                                        <input type="file" id="audio-folder-input" accept="audio/*" class="hidden" webkitdirectory directory multiple />
+                                        <div class="text-[9px] text-outline font-section-header uppercase tracking-wider"
+                                            data-translate="playlist-header">Playlist</div>
+                                        <input type="file" id="audio-file-input" accept="audio/*" class="hidden"
+                                            multiple />
+                                        <input type="file" id="audio-folder-input" accept="audio/*" class="hidden"
+                                            webkitdirectory directory multiple />
                                     </div>
-                                    <div id="player-playlist" class="flex flex-col max-h-[220px] overflow-y-auto pr-1 bg-black border border-outline-variant rounded p-1.5 font-mono text-[10px] space-y-0.5">
+                                    <div id="player-playlist"
+                                        class="flex flex-col max-h-[220px] overflow-y-auto pr-1 bg-black border border-outline-variant rounded p-1.5 font-mono text-[10px] space-y-0.5">
                                         <!-- Will be filled dynamically by JavaScript -->
                                     </div>
                                 </div>
@@ -517,7 +611,8 @@
                     <div class="flex items-center gap-3">
                         <span
                             class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-primary">style</span>
-                        <span data-translate="presets-header" class="font-section-header text-section-header uppercase">Presets</span>
+                        <span data-translate="presets-header"
+                            class="font-section-header text-section-header uppercase">Presets</span>
                     </div>
                     <span class="chevron-icon material-symbols-outlined text-on-surface-variant text-[18px] collapsed"
                         id="chevron-presets">expand_more</span>
@@ -526,23 +621,23 @@
                     <div class="accordion-inner">
                         <div class="px-panel-padding py-4 border-t border-outline-variant flex flex-wrap gap-2"
                             id="presets-container">
-                            <button
-                                data-translate="preset-police" class="px-3 py-1.5 bg-surface-container-high border border-outline-variant text-[10px] font-bold uppercase cursor-pointer hover:border-primary transition-colors text-on-surface-variant"
+                            <button data-translate="preset-police"
+                                class="px-3 py-1.5 bg-surface-container-high border border-outline-variant text-[10px] font-bold uppercase cursor-pointer hover:border-primary transition-colors text-on-surface-variant"
                                 id="preset-police">POLICE</button>
-                            <button
-                                data-translate="preset-tech" class="px-3 py-1.5 bg-surface-container-high border border-outline-variant text-[10px] font-bold uppercase cursor-pointer hover:border-primary transition-colors text-on-surface-variant"
+                            <button data-translate="preset-tech"
+                                class="px-3 py-1.5 bg-surface-container-high border border-outline-variant text-[10px] font-bold uppercase cursor-pointer hover:border-primary transition-colors text-on-surface-variant"
                                 id="preset-tech">TECH</button>
-                            <button
-                                data-translate="preset-candle" class="px-3 py-1.5 bg-surface-container-high border border-outline-variant text-[10px] font-bold uppercase cursor-pointer hover:border-primary transition-colors text-on-surface-variant"
+                            <button data-translate="preset-candle"
+                                class="px-3 py-1.5 bg-surface-container-high border border-outline-variant text-[10px] font-bold uppercase cursor-pointer hover:border-primary transition-colors text-on-surface-variant"
                                 id="preset-candle">CANDLE</button>
-                            <button
-                                data-translate="preset-tv" class="px-3 py-1.5 bg-surface-container-high border border-outline-variant text-[10px] font-bold uppercase cursor-pointer hover:border-primary transition-colors text-on-surface-variant"
+                            <button data-translate="preset-tv"
+                                class="px-3 py-1.5 bg-surface-container-high border border-outline-variant text-[10px] font-bold uppercase cursor-pointer hover:border-primary transition-colors text-on-surface-variant"
                                 id="preset-tv">TV</button>
-                            <button
-                                data-translate="preset-party" class="px-3 py-1.5 bg-surface-container-high border border-outline-variant text-[10px] font-bold uppercase cursor-pointer hover:border-primary transition-colors text-on-surface-variant"
+                            <button data-translate="preset-party"
+                                class="px-3 py-1.5 bg-surface-container-high border border-outline-variant text-[10px] font-bold uppercase cursor-pointer hover:border-primary transition-colors text-on-surface-variant"
                                 id="preset-party">PARTY</button>
-                            <button
-                                data-translate="preset-fire" class="px-3 py-1.5 bg-surface-container-high border border-outline-variant text-[10px] font-bold uppercase cursor-pointer hover:border-primary transition-colors text-on-surface-variant"
+                            <button data-translate="preset-fire"
+                                class="px-3 py-1.5 bg-surface-container-high border border-outline-variant text-[10px] font-bold uppercase cursor-pointer hover:border-primary transition-colors text-on-surface-variant"
                                 id="preset-fire">FIRE</button>
                         </div>
                     </div>
@@ -556,7 +651,8 @@
                     <div class="flex items-center gap-3">
                         <span
                             class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-primary">photo_library</span>
-                        <span data-translate="library-header" class="font-section-header text-section-header uppercase">Library</span>
+                        <span data-translate="library-header"
+                            class="font-section-header text-section-header uppercase">Library</span>
                     </div>
                     <span class="chevron-icon material-symbols-outlined text-on-surface-variant text-[18px] collapsed"
                         id="chevron-library">expand_more</span>
@@ -626,7 +722,7 @@
         // Playlist track registry
         let playlist = [];
         let currentPlaylistIndex = 0;
-        
+
         // Hidden audio element for file playback
         const audioPlayer = document.createElement('audio');
 
@@ -638,7 +734,7 @@
         const sourceFile = audioCtx.createMediaElementSource(audioPlayer);
         sourceFile.connect(analyser);
         // Connect music to speakers
-        sourceFile.connect(audioCtx.destination); 
+        sourceFile.connect(audioCtx.destination);
         let sourceMic = null;
 
         // Multi-language Translation Engine (EN, RU, UA)
@@ -681,7 +777,11 @@
                 "fullscreen-hint": "Double-click for fullscreen. Double-click again to exit.",
                 "playlist-header": "Playlist",
                 "add-track-item": "Add Tracks",
-                "add-folder-item": "Add Folder"
+                "add-folder-item": "Add Folder",
+                "wake-lock-default": "Disable Sleep Mode",
+                "wake-lock-active": "Sleep Mode: Disabled",
+                "wake-lock-error": "Error (Not Supported)",
+                "wake-lock-unsupported": "Your browser does not support Sleep Mode control."
             },
             ru: {
                 "adjustments-header": "Настройки",
@@ -719,7 +819,11 @@
                 "fullscreen-hint": "Дважды кликните для полноэкранного режима. Чтобы выйти, дважды кликните по экрану.",
                 "playlist-header": "Плейлист",
                 "add-track-item": "Треки",
-                "add-folder-item": "Папку"
+                "add-folder-item": "Папку",
+                "wake-lock-default": "Отключить спящий режим",
+                "wake-lock-active": "Спящий режим: Отключен",
+                "wake-lock-error": "Ошибка (Не поддерживается)",
+                "wake-lock-unsupported": "Ваш браузер не поддерживает управление спящим режимом."
             },
             ua: {
                 "adjustments-header": "Налаштування",
@@ -757,7 +861,11 @@
                 "fullscreen-hint": "Двічі клікніть для повного екрану. Щоб вийти з повного екрану, двічі клікніть по екрану.",
                 "playlist-header": "Плейлист",
                 "add-track-item": "Треки",
-                "add-folder-item": "Папку"
+                "add-folder-item": "Папку",
+                "wake-lock-default": "Вимкнути сплячий режим",
+                "wake-lock-active": "Сплячий режим: Вимкнено",
+                "wake-lock-error": "Помилка (Не підтримується)",
+                "wake-lock-unsupported": "Ваш браузер не підтримує керування сплячим режимом."
             }
         };
 
@@ -770,7 +878,7 @@
         function changeLanguage(lang) {
             currentLang = lang;
             localStorage.setItem('led-studio-lang', lang);
-            
+
             // Toggle active visual states of switcher buttons
             document.querySelectorAll('.lang-btn').forEach(btn => {
                 btn.classList.remove('active-lang', 'bg-primary', 'text-on-primary');
@@ -865,7 +973,7 @@
                 contentWrapper.style.top = '0';
                 contentWrapper.style.left = '0';
                 contentWrapper.style.pointerEvents = 'none';
-                
+
                 const aside = document.querySelector('aside');
                 Array.from(ledPanel.childNodes).forEach(node => {
                     if (node !== aside) {
@@ -1221,7 +1329,7 @@
         // Helper functions for dynamic marquee lines
         function addMarqueeLine() {
             const container = document.getElementById('marquee-inputs-container');
-            
+
             const newLine = document.createElement('div');
             newLine.className = 'flex gap-1.5 items-center';
             newLine.innerHTML = `
@@ -1233,9 +1341,9 @@
                 </button>
             `;
             container.appendChild(newLine);
-            
+
             bindMarqueeInputEvents();
-            
+
             if (marqueeActive) {
                 updateMarqueeText();
             }
@@ -1244,14 +1352,14 @@
         function removeMarqueeLine(button) {
             const row = button.parentElement;
             row.remove();
-            
+
             // Ensure all fields have correct localized placeholder
             const container = document.getElementById('marquee-inputs-container');
             const inputs = container.querySelectorAll('.marquee-input-line');
             inputs.forEach((input) => {
                 input.placeholder = getLocalizedPlaceholder();
             });
-            
+
             if (marqueeActive) {
                 updateMarqueeText();
             }
@@ -1392,7 +1500,7 @@
             const lines = getMarqueeLinesText();
             const saveBtn = document.getElementById('btn-marquee-save-video');
             const originalContent = saveBtn.innerHTML;
- 
+
             // Set recording state dynamically based on active language
             let recText = `Recording (${duration}s)...`;
             if (currentLang === 'ru') recText = `Запись (${duration}с)...`;
@@ -1403,18 +1511,18 @@
                 <span class="font-label-sm uppercase font-bold text-[11px]">${recText}</span>
             `;
             saveBtn.disabled = true;
- 
+
             // Create canvas
             const canvas = document.createElement('canvas');
             canvas.width = 640;
             canvas.height = 360;
             const ctx = canvas.getContext('2d');
- 
+
             // Capture stream
             const stream = canvas.captureStream(30); // 30 FPS
             const recorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9' });
             const chunks = [];
- 
+
             recorder.ondataavailable = e => chunks.push(e.data);
             recorder.onstop = () => {
                 const blob = new Blob(chunks, { type: 'video/webm' });
@@ -1423,26 +1531,26 @@
                 a.href = url;
                 a.download = `led-marquee-${Date.now()}.webm`;
                 a.click();
- 
+
                 // Restore button state
                 saveBtn.innerHTML = originalContent;
                 saveBtn.disabled = false;
             };
- 
+
             // Read current colors and size
             const textSize = parseInt(document.getElementById('marquee-text-size-slider').value);
             const textHue = parseInt(document.getElementById('marquee-text-color-slider').value);
             const textColor = textHue === 0 ? '#FFFFFF' : `hsl(${textHue}, 100%, 50%)`;
- 
+
             const bgColor = '#000000'; // Всегда черный фон
- 
+
             const speed = parseFloat(document.getElementById('marquee-speed-slider').value);
- 
+
             // Animate canvas
             let x = canvas.width;
             let recordingActive = true;
             let maxTextWidth = 0;
- 
+
             // Pre-render the LED Dot Grid Overlay once to avoid CPU overload and extreme lag during recording (25,500x performance boost!)
             const gridCanvas = document.createElement('canvas');
             gridCanvas.width = canvas.width;
@@ -1451,7 +1559,7 @@
             gCtx.fillStyle = "rgba(19, 19, 19, 0.95)";
             const dotSpacing = 3;
             const dotRadius = 1.35;
- 
+
             for (let py = 0; py < gridCanvas.height; py += dotSpacing) {
                 for (let px = 0; px < gridCanvas.width; px += dotSpacing) {
                     gCtx.beginPath();
@@ -1460,39 +1568,39 @@
                     gCtx.fill();
                 }
             }
- 
+
             function drawFrame() {
                 if (!recordingActive) return;
- 
+
                 // 1. Draw background
                 ctx.fillStyle = bgColor;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
- 
+
                 // 2. Draw text
                 ctx.fillStyle = textColor;
                 ctx.font = "900 " + textSize + "px 'Outfit', 'Inter', sans-serif";
                 ctx.textBaseline = "middle";
-                
+
                 // Measure widest line for scroll mapping and offset alignment
                 maxTextWidth = 0;
                 lines.forEach(line => {
                     const w = ctx.measureText(line).width;
                     if (w > maxTextWidth) maxTextWidth = w;
                 });
-                
+
                 const lineHeight = textSize * 1.15; // Gorgeous line spacing
                 const totalHeight = lineHeight * lines.length;
                 const startY = (canvas.height - totalHeight) / 2 + lineHeight / 2;
-                
+
                 lines.forEach((line, index) => {
                     const lineW = ctx.measureText(line).width;
                     const offsetX = (maxTextWidth - lineW) / 2; // Symmetrically center each line
                     ctx.fillText(line, x + offsetX, startY + index * lineHeight);
                 });
- 
+
                 // 3. Draw LED Dot Grid Overlay (drawn instantly as a single image instead of 25,560 separate loops)
                 ctx.drawImage(gridCanvas, 0, 0);
- 
+
                 // Increment scroll position
                 x -= (speed * 0.7);
                 if (x < -maxTextWidth) {
@@ -1591,13 +1699,13 @@
         const asideElement = document.querySelector('aside');
 
         let isDraggingInsideAside = false;
-        
+
         // Prevent click events on the main panel if they originated as a drag from inside the control panel
         if (asideElement) {
             asideElement.addEventListener('mousedown', () => { isDraggingInsideAside = true; });
             asideElement.addEventListener('touchstart', () => { isDraggingInsideAside = true; }, { passive: true });
         }
-        
+
         document.addEventListener('mouseup', () => { setTimeout(() => { isDraggingInsideAside = false; }, 0); });
         document.addEventListener('touchend', () => { setTimeout(() => { isDraggingInsideAside = false; }, 0); });
 
@@ -1651,10 +1759,10 @@
         ledPanel.addEventListener('click', (e) => {
             if (document.fullscreenElement) {
                 if (isDraggingInsideAside) return;
-                
+
                 // Ignore clicks inside the aside panel
                 if (asideElement && asideElement.contains(e.target)) return;
-                
+
                 if (asideElement.style.display === 'none') {
                     // Only show if the screen is wide enough (>= 768px)
                     // This prevents the control panel from taking 100% width and trapping the user on mobile portrait
@@ -1682,21 +1790,21 @@
         let updatingSlidersFromCode = false;
 
         const PLANETS = {
-            earth: { cols: 20, rows: 15, colGap: 4, rowGap: 3, shape: 'rounded-[1px]', getRGB: (c, r, tr) => r < tr*0.6 ? [16,185,129] : (r < tr*0.8 ? [251,191,36] : [244,63,94]) },
-            mars: { cols: 24, rows: 12, colGap: 3, rowGap: 2, shape: 'rounded-[2px]', getRGB: (c, r, tr) => r < tr*0.5 ? [239,68,68] : (r < tr*0.8 ? [249,115,22] : [234,179,8]) },
-            jupiter: { cols: 10, rows: 8, colGap: 6, rowGap: 5, shape: 'rounded-[4px]', getRGB: (c, r, tr) => r < tr*0.4 ? [202,138,4] : (r < tr*0.7 ? [217,119,6] : [248,113,113]) },
-            saturn: { cols: 32, rows: 16, colGap: 2, rowGap: 2, shape: 'rounded-full', getRGB: (c, r, tr) => r < tr*0.6 ? [253,224,71] : [254,240,138] },
-            venus: { cols: 16, rows: 20, colGap: 4, rowGap: 4, shape: 'rounded-full', getRGB: (c, r, tr) => r < tr*0.5 ? [236,72,153] : [192,38,211] },
-            neptune: { cols: 28, rows: 14, colGap: 3, rowGap: 2, shape: 'rounded-[1px]', getRGB: (c, r, tr) => r < tr*0.7 ? [14,165,233] : [6,182,212] },
-            pluto: { cols: 12, rows: 12, colGap: 5, rowGap: 5, shape: 'rounded-full', getRGB: (c, r, tr) => [224,242,254] },
-            uranus: { cols: 36, rows: 18, colGap: 2, rowGap: 2, shape: 'rounded-[2px]', getRGB: (c, r, tr) => r < tr*0.6 ? [20,184,166] : [45,212,191] }
+            earth: { cols: 20, rows: 15, colGap: 4, rowGap: 3, shape: 'rounded-[1px]', getRGB: (c, r, tr) => r < tr * 0.6 ? [16, 185, 129] : (r < tr * 0.8 ? [251, 191, 36] : [244, 63, 94]) },
+            mars: { cols: 24, rows: 12, colGap: 3, rowGap: 2, shape: 'rounded-[2px]', getRGB: (c, r, tr) => r < tr * 0.5 ? [239, 68, 68] : (r < tr * 0.8 ? [249, 115, 22] : [234, 179, 8]) },
+            jupiter: { cols: 10, rows: 8, colGap: 6, rowGap: 5, shape: 'rounded-[4px]', getRGB: (c, r, tr) => r < tr * 0.4 ? [202, 138, 4] : (r < tr * 0.7 ? [217, 119, 6] : [248, 113, 113]) },
+            saturn: { cols: 32, rows: 16, colGap: 2, rowGap: 2, shape: 'rounded-full', getRGB: (c, r, tr) => r < tr * 0.6 ? [253, 224, 71] : [254, 240, 138] },
+            venus: { cols: 16, rows: 20, colGap: 4, rowGap: 4, shape: 'rounded-full', getRGB: (c, r, tr) => r < tr * 0.5 ? [236, 72, 153] : [192, 38, 211] },
+            neptune: { cols: 28, rows: 14, colGap: 3, rowGap: 2, shape: 'rounded-[1px]', getRGB: (c, r, tr) => r < tr * 0.7 ? [14, 165, 233] : [6, 182, 212] },
+            pluto: { cols: 12, rows: 12, colGap: 5, rowGap: 5, shape: 'rounded-full', getRGB: (c, r, tr) => [224, 242, 254] },
+            uranus: { cols: 36, rows: 18, colGap: 2, rowGap: 2, shape: 'rounded-[2px]', getRGB: (c, r, tr) => r < tr * 0.6 ? [20, 184, 166] : [45, 212, 191] }
         };
 
         function rebuildEqualizerGrid() {
             const config = PLANETS[activeEqMode] || PLANETS.earth;
             let contentWrapper = document.getElementById('led-content-wrapper');
             let mainContainer = contentWrapper ? contentWrapper.querySelector('.w-full.h-full.flex.bg-black') : null;
-            
+
             // If the main container doesn't exist, build from scratch
             if (!mainContainer) {
                 let html = `<div class="w-full h-full flex justify-between items-stretch p-4 md:p-6 bg-black relative eq-main-container" style="background-color: #000000; box-sizing: border-box; gap: ${eqColGap}px;">`;
@@ -1704,30 +1812,30 @@
                     html += `<div class="flex flex-col-reverse justify-start flex-1 h-full eq-col-container" id="eq-col-${c}" style="gap: ${eqRowGap}px;">`;
                     for (let r = 0; r < eqRows; r++) {
                         const rgb = config.getRGB(c, r, eqRows);
-                        html += `<div class="eq-segment w-full ${config.shape}" style="opacity: 0.15; background-color: rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]}); height: ${100/eqRows}%;" data-col="${c}" data-row="${r}"></div>`;
+                        html += `<div class="eq-segment w-full ${config.shape}" style="opacity: 0.15; background-color: rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]}); height: ${100 / eqRows}%;" data-col="${c}" data-row="${r}"></div>`;
                     }
                     html += '</div>';
                 }
                 html += '</div>';
                 setLedHTML(html);
-                
+
                 peakRow = Array(eqCols).fill(0);
                 peakHoldTime = Array(eqCols).fill(0);
                 colDisplayHeight = Array(eqCols).fill(0);
                 return;
             }
-            
+
             // Incremental DOM update for extremely fast slider interactions
             mainContainer.style.gap = eqColGap + 'px';
-            
+
             let currentCols = mainContainer.children.length;
-            
+
             // Adjust Columns
             while (currentCols > eqCols) {
                 mainContainer.removeChild(mainContainer.lastChild);
                 currentCols--;
             }
-            
+
             while (currentCols < eqCols) {
                 let colDiv = document.createElement('div');
                 colDiv.className = `flex flex-col-reverse justify-start flex-1 h-full eq-col-container`;
@@ -1736,14 +1844,14 @@
                 mainContainer.appendChild(colDiv);
                 currentCols++;
             }
-            
+
             // Adjust Rows in ALL Columns and update styles
             for (let c = 0; c < currentCols; c++) {
                 let colDiv = mainContainer.children[c];
                 colDiv.style.gap = eqRowGap + 'px';
-                
+
                 let currentRows = colDiv.children.length;
-                
+
                 // Add or update rows
                 for (let r = 0; r < Math.max(currentRows, eqRows); r++) {
                     if (r >= eqRows) {
@@ -1758,7 +1866,7 @@
                         const rgb = config.getRGB(c, r, eqRows);
                         seg.style.backgroundColor = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
                         seg.style.opacity = '0.15';
-                        seg.style.height = `${100/eqRows}%`;
+                        seg.style.height = `${100 / eqRows}%`;
                         colDiv.appendChild(seg);
                     } else {
                         // Update existing rows
@@ -1768,23 +1876,23 @@
                         seg.dataset.row = r;
                         const rgb = config.getRGB(c, r, eqRows);
                         seg.style.backgroundColor = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
-                        seg.style.height = `${100/eqRows}%`;
+                        seg.style.height = `${100 / eqRows}%`;
                     }
                 }
             }
-            
+
             // Adjust peak arrays safely
             if (peakRow.length !== eqCols) {
                 let newPeakRow = Array(eqCols).fill(0);
                 let newPeakHoldTime = Array(eqCols).fill(0);
                 let newColHeight = Array(eqCols).fill(0);
-                
-                for(let i=0; i<Math.min(eqCols, peakRow.length); i++) {
+
+                for (let i = 0; i < Math.min(eqCols, peakRow.length); i++) {
                     newPeakRow[i] = peakRow[i];
                     newPeakHoldTime[i] = peakHoldTime[i];
                     newColHeight[i] = colDisplayHeight[i];
                 }
-                
+
                 peakRow = newPeakRow;
                 peakHoldTime = newPeakHoldTime;
                 colDisplayHeight = newColHeight;
@@ -1855,16 +1963,16 @@
                 if (!isFakeData) {
                     analyser.getByteFrequencyData(dataArray);
                 } else {
-                    for(let i=0; i<dataArray.length; i++) {
+                    for (let i = 0; i < dataArray.length; i++) {
                         let diff = (Math.random() - 0.5) * 40;
-                        if (Math.random() < 0.04) diff += Math.random() * 180; 
+                        if (Math.random() < 0.04) diff += Math.random() * 180;
                         let val = dataArray[i] + diff;
                         dataArray[i] = Math.max(0, Math.min(255, val * 0.93));
                     }
                 }
 
                 const binMapping = [];
-                for(let i=0; i<eqCols; i++) {
+                for (let i = 0; i < eqCols; i++) {
                     let binIndex = Math.floor(Math.pow(i / Math.max(1, eqCols - 1), 1.8) * 90) + 1;
                     if (binIndex >= dataArray.length) binIndex = dataArray.length - 1;
                     binMapping.push(binIndex);
@@ -1880,7 +1988,7 @@
                     const bin = binMapping[c];
                     let val = 0;
 
-                    if (c < Math.max(3, Math.floor(eqCols*0.2))) {
+                    if (c < Math.max(3, Math.floor(eqCols * 0.2))) {
                         val = dataArray[bin];
                     } else {
                         const windowSize = Math.min(5, Math.floor(c / 3));
@@ -1894,7 +2002,7 @@
                         val = sum / (count || 1);
                     }
 
-                    val = val * 0.65; 
+                    val = val * 0.65;
                     let boost = 1.0;
                     if (c > Math.floor(eqCols * 0.25)) {
                         boost = 1.0 + (c - Math.floor(eqCols * 0.25)) * 0.15;
@@ -1908,7 +2016,7 @@
                     if (targetLitCount > colDisplayHeight[c]) {
                         colDisplayHeight[c] = targetLitCount;
                     } else {
-                        colDisplayHeight[c] -= 0.65 * (15 / eqRows); 
+                        colDisplayHeight[c] -= 0.65 * (15 / eqRows);
                         if (colDisplayHeight[c] < 0) colDisplayHeight[c] = 0;
                     }
 
@@ -1921,7 +2029,7 @@
                         if (peakHoldTime[c] > 0) {
                             peakHoldTime[c]--;
                         } else {
-                            peakRow[c] = Math.max(0, peakRow[c] - (0.22 * (eqRows/15)));
+                            peakRow[c] = Math.max(0, peakRow[c] - (0.22 * (eqRows / 15)));
                         }
                     }
 
@@ -1933,14 +2041,14 @@
                                 const rgb = config.getRGB(c, r, eqRows);
                                 segment.style.opacity = baseOpacity;
                                 segment.style.boxShadow = `0 0 10px rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.85)`;
-                                
+
                                 const isVibratingSegment = (isPeak || (r === litCount - 1 && litCount > 0));
                                 if (isVibratingSegment && litCount >= (eqRows * 0.6)) {
                                     segment.classList.add('eq-column-vibrating');
                                 } else {
                                     segment.classList.remove('eq-column-vibrating');
                                 }
-                                
+
                                 activeR += rgb[0]; activeG += rgb[1]; activeB += rgb[2];
                                 activeCount++;
                             } else {
@@ -1975,7 +2083,7 @@
 
             if (!micActive) {
                 micActive = true;
-                
+
                 // If audio player is playing, pause it to prevent clash
                 if (!audioPlayer.paused) {
                     audioPlayer.pause();
@@ -2032,26 +2140,26 @@
             if (updatingSlidersFromCode) return;
             const colsSlider = document.getElementById('eq-cols-slider');
             if (!colsSlider) return;
-            
+
             const newCols = parseInt(colsSlider.value);
             document.getElementById('eq-cols-val').textContent = newCols;
-            
+
             const newRows = parseInt(document.getElementById('eq-rows-slider').value);
             document.getElementById('eq-rows-val').textContent = newRows;
-            
+
             const newColGap = parseInt(document.getElementById('eq-col-gap-slider').value);
             document.getElementById('eq-col-gap-val').textContent = newColGap + 'px';
-            
+
             const newRowGap = parseInt(document.getElementById('eq-row-gap-slider').value);
             document.getElementById('eq-row-gap-val').textContent = newRowGap + 'px';
-            
+
             const needsRebuild = (newCols !== eqCols || newRows !== eqRows);
-            
+
             eqCols = newCols;
             eqRows = newRows;
             eqColGap = newColGap;
             eqRowGap = newRowGap;
-            
+
             if (equalizerActive) {
                 if (needsRebuild) {
                     rebuildEqualizerGrid();
@@ -2097,31 +2205,30 @@
             playlist.forEach((track, index) => {
                 const item = document.createElement('div');
                 const isActive = (index === currentPlaylistIndex);
-                
-                item.className = `flex items-center justify-between py-1 px-1.5 rounded transition-colors cursor-pointer ${
-                    isActive 
-                        ? 'bg-surface-container-high text-[#10b981] font-bold' 
-                        : 'text-on-surface-variant hover:bg-surface-container-high'
-                }`;
-                
+
+                item.className = `flex items-center justify-between py-1 px-1.5 rounded transition-colors cursor-pointer ${isActive
+                    ? 'bg-surface-container-high text-[#10b981] font-bold'
+                    : 'text-on-surface-variant hover:bg-surface-container-high'
+                    }`;
+
                 const title = document.createElement('span');
                 title.className = 'truncate flex-1 mr-2';
                 // Numbered format: 01. Name, 02. Name...
                 const trackNumber = String(index + 1).padStart(2, '0');
                 title.textContent = `${trackNumber}. ${track.name}`;
-                
+
                 const controlsContainer = document.createElement('div');
                 controlsContainer.className = 'flex items-center gap-1.5 shrink-0';
 
                 const playIcon = document.createElement('span');
                 playIcon.className = `material-symbols-outlined text-[13px] ${isActive ? 'text-[#10b981]' : 'text-outline-variant'}`;
                 playIcon.textContent = (isActive && !audioPlayer.paused) ? 'volume_up' : 'play_arrow';
-                
+
                 const deleteBtn = document.createElement('span');
                 deleteBtn.className = 'material-symbols-outlined text-[13px] text-outline-variant hover:text-red-500 transition-colors cursor-pointer';
                 deleteBtn.textContent = 'delete';
                 deleteBtn.title = 'Remove track';
-                
+
                 deleteBtn.addEventListener('click', (e) => {
                     e.stopPropagation(); // prevent selectTrack(index) on item click
                     removeTrack(index);
@@ -2129,14 +2236,14 @@
 
                 controlsContainer.appendChild(playIcon);
                 controlsContainer.appendChild(deleteBtn);
-                
+
                 item.appendChild(title);
                 item.appendChild(controlsContainer);
-                
+
                 item.addEventListener('click', () => {
                     selectTrack(index);
                 });
-                
+
                 playlistContainer.appendChild(item);
             });
 
@@ -2147,18 +2254,18 @@
             // "+ Add Track..."
             const addTrackItem = document.createElement('div');
             addTrackItem.className = 'flex-1 flex items-center justify-center gap-1.5 py-1 px-1.5 border border-dashed border-outline-variant hover:border-primary hover:bg-surface-container-high text-[#10b981]/80 hover:text-[#10b981] transition-colors text-[9px] font-mono cursor-pointer';
-            
+
             const addTrackIcon = document.createElement('span');
             addTrackIcon.className = 'material-symbols-outlined text-[12px]';
             addTrackIcon.textContent = 'add_circle';
-            
+
             const addTrackLabel = document.createElement('span');
             addTrackLabel.setAttribute('data-translate', 'add-track-item');
             addTrackLabel.textContent = translations[currentLang] && translations[currentLang]['add-track-item'] ? translations[currentLang]['add-track-item'] : 'Add Tracks';
-            
+
             addTrackItem.appendChild(addTrackIcon);
             addTrackItem.appendChild(addTrackLabel);
-            
+
             addTrackItem.addEventListener('click', (e) => {
                 e.preventDefault();
                 audioFileInput.click();
@@ -2167,18 +2274,18 @@
             // "+ Add Folder..."
             const addFolderItem = document.createElement('div');
             addFolderItem.className = 'flex-1 flex items-center justify-center gap-1.5 py-1 px-1.5 border border-dashed border-outline-variant hover:border-primary hover:bg-surface-container-high text-[#10b981]/80 hover:text-[#10b981] transition-colors text-[9px] font-mono cursor-pointer';
-            
+
             const addFolderIcon = document.createElement('span');
             addFolderIcon.className = 'material-symbols-outlined text-[12px]';
             addFolderIcon.textContent = 'create_new_folder';
-            
+
             const addFolderLabel = document.createElement('span');
             addFolderLabel.setAttribute('data-translate', 'add-folder-item');
             addFolderLabel.textContent = translations[currentLang] && translations[currentLang]['add-folder-item'] ? translations[currentLang]['add-folder-item'] : 'Add Folder';
-            
+
             addFolderItem.appendChild(addFolderIcon);
             addFolderItem.appendChild(addFolderLabel);
-            
+
             addFolderItem.addEventListener('click', (e) => {
                 e.preventDefault();
                 audioFolderInput.click();
@@ -2192,7 +2299,7 @@
         // Remove track from playlist
         function removeTrack(index) {
             playlist.splice(index, 1);
-            
+
             if (playlist.length === 0) {
                 currentPlaylistIndex = 0;
                 audioPlayer.pause();
@@ -2222,10 +2329,10 @@
         function selectTrack(index) {
             currentPlaylistIndex = index;
             const track = playlist[index];
-            
+
             audioPlayer.src = track.url;
             audioPlayer.load();
-            
+
             playerTrackInfo.textContent = track.name;
             playerTrackInfo.classList.remove('hidden');
             playerPlayBtn.disabled = false;
@@ -2233,22 +2340,22 @@
             playerPrevBtn.disabled = false;
             playerNextBtn.disabled = false;
             playerProgress.disabled = false;
-            
+
             initAudio();
 
 
-            
+
             stopMicrophone();
             audioPlayer.play();
             if (!equalizerActive) {
                 startEqualizerMode();
             }
-            
+
             renderPlaylist();
         }
 
         // Handle file uploads (supporting multiple files selection)
-        audioFileInput.addEventListener('change', function(e) {
+        audioFileInput.addEventListener('change', function (e) {
             const files = e.target.files;
             if (!files || files.length === 0) return;
 
@@ -2260,13 +2367,13 @@
                     playlist.push({ name: file.name, url: url });
                 }
             }
-            
+
             selectTrack(firstNewIndex);
         });
 
         // Handle folder uploads
         if (audioFolderInput) {
-            audioFolderInput.addEventListener('change', function(e) {
+            audioFolderInput.addEventListener('change', function (e) {
                 const files = e.target.files;
                 if (!files || files.length === 0) return;
 
@@ -2281,12 +2388,12 @@
                         added = true;
                     }
                 }
-                
+
                 if (added) selectTrack(firstNewIndex);
             });
         }
 
-        playerPlayBtn.addEventListener('click', function() {
+        playerPlayBtn.addEventListener('click', function () {
             initAudio();
 
             if (audioPlayer.paused) {
@@ -2300,21 +2407,21 @@
             }
         });
 
-        playerStopBtn.addEventListener('click', function() {
+        playerStopBtn.addEventListener('click', function () {
             audioPlayer.pause();
             audioPlayer.currentTime = 0;
             playerPlayBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">play_arrow</span>';
             // Also turn off active preset if needed or let equalizer settle
         });
 
-        playerPrevBtn.addEventListener('click', function() {
+        playerPrevBtn.addEventListener('click', function () {
             if (playlist.length === 0) return;
             let nextIndex = currentPlaylistIndex - 1;
             if (nextIndex < 0) nextIndex = playlist.length - 1;
             selectTrack(nextIndex);
         });
 
-        playerNextBtn.addEventListener('click', function() {
+        playerNextBtn.addEventListener('click', function () {
             if (playlist.length === 0) return;
             let nextIndex = currentPlaylistIndex + 1;
             if (nextIndex >= playlist.length) nextIndex = 0;
@@ -2343,13 +2450,13 @@
             playerTimeTotal.textContent = formatTime(audioPlayer.duration);
         });
 
-        playerProgress.addEventListener('input', function() {
+        playerProgress.addEventListener('input', function () {
             if (audioPlayer.duration) {
                 audioPlayer.currentTime = (this.value / 100) * audioPlayer.duration;
             }
         });
 
-        playerVolume.addEventListener('input', function() {
+        playerVolume.addEventListener('input', function () {
             const vol = this.value / 100;
             audioPlayer.volume = vol;
             playerVolumeVal.textContent = this.value + "%";
@@ -2368,7 +2475,7 @@
                 const track = playlist[0];
                 audioPlayer.src = track.url;
                 audioPlayer.load();
-                
+
                 playerTrackInfo.textContent = track.name;
                 playerTrackInfo.classList.remove('hidden');
                 playerPlayBtn.disabled = false;
@@ -2394,6 +2501,9 @@
             startMarquee();
         });
     </script>
+
+    <!-- Скрипт управления спящим режимом экрана -->
+    <script src="wakeLock.js"></script>
 </body>
 
 </html>
