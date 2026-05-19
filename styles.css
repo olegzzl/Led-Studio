@@ -169,3 +169,29 @@ input[type=range]:hover::-webkit-slider-thumb {
 #led-panel:fullscreen .led-matrix-overlay {
     background-size: 10px 10px !important; /* Scale up spacing for crisp matrix dot presentation */
 }
+
+/* Equalizer Visualizer Styles */
+.eq-led {
+    transition: opacity 0.04s ease, box-shadow 0.04s ease;
+}
+.eq-led-green {
+    background-color: #10b981; /* emerald-500 */
+}
+.eq-led-green.active {
+    opacity: 1 !important;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.85);
+}
+.eq-led-yellow {
+    background-color: #fbbf24; /* amber-400 */
+}
+.eq-led-yellow.active {
+    opacity: 1 !important;
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.85);
+}
+.eq-led-red {
+    background-color: #f43f5e; /* rose-500 */
+}
+.eq-led-red.active {
+    opacity: 1 !important;
+    box-shadow: 0 0 12px rgba(244, 63, 94, 0.95);
+}

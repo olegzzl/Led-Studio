@@ -127,6 +127,18 @@
             background-image: radial-gradient(transparent 33.33%, rgba(19, 19, 19, 0.95) 50%);
             background-size: calc(3px * var(--led-scale, 1)) calc(3px * var(--led-scale, 1));
         }
+
+        /* Column-level vibration/jitter on peak signals */
+        @keyframes eq-col-jitter {
+            0% { transform: translateY(0); }
+            25% { transform: translateY(-1.5px); }
+            50% { transform: translateY(1.5px); }
+            75% { transform: translateY(-1px); }
+            100% { transform: translateY(0); }
+        }
+        .eq-column-vibrating {
+            animation: eq-col-jitter 0.06s linear infinite;
+        }
     </style>
 </head>
 
@@ -281,10 +293,10 @@
                     <div class="flex items-center gap-2">
                         <span data-translate="marquee-header" class="font-section-header text-section-header uppercase">Marquee Control</span>
                     </div>
-                    <span class="chevron-icon material-symbols-outlined text-on-surface-variant text-[18px]"
+                    <span class="chevron-icon material-symbols-outlined text-on-surface-variant text-[18px] collapsed"
                         id="chevron-marquee">expand_more</span>
                 </button>
-                <div class="accordion-content bg-surface-container/30" id="content-marquee">
+                <div class="accordion-content bg-surface-container/30 collapsed" id="content-marquee">
                     <div class="accordion-inner">
                         <div class="px-panel-padding py-4 border-t border-outline-variant">
                             <div class="space-y-5">
@@ -368,23 +380,80 @@
                 </div>
             </div>
 
-            <!-- Additional Control Sections (Mixer, Presets, Library) -->
+            <!-- Additional Control Sections (Equalizer, Presets, Library) -->
             <div class="flex flex-col border-b border-outline-variant">
                 <button
                     class="w-full flex items-center justify-between px-panel-padding py-4 hover:bg-surface-container-high transition-colors group text-left"
-                    onclick="toggleAccordion('mixer')">
+                    onclick="toggleAccordion('equalizer')">
                     <div class="flex items-center gap-3">
-                        <span class="material-symbols-outlined text-[18px] text-primary">tune</span>
-                        <span data-translate="mixer-header" class="font-section-header text-section-header uppercase">Mixer</span>
+                        <span class="material-symbols-outlined text-[18px] text-primary">equalizer</span>
+                        <span data-translate="equalizer-header" class="font-section-header text-section-header uppercase">Equalizer</span>
                     </div>
-                    <span class="chevron-icon material-symbols-outlined text-on-surface-variant text-[18px]"
-                        id="chevron-mixer">expand_more</span>
+                    <span class="chevron-icon material-symbols-outlined text-on-surface-variant text-[18px] collapsed"
+                        id="chevron-equalizer">expand_more</span>
                 </button>
-                <div class="accordion-content" id="content-mixer">
+                <div class="accordion-content collapsed" id="content-equalizer">
                     <div class="accordion-inner">
-                        <div
-                            data-translate="mixer-content" class="px-panel-padding py-4 border-t border-outline-variant text-on-surface-variant text-body-md opacity-60 italic">
-                            Mixing controls are currently inactive.
+                        <div class="px-panel-padding py-4 border-t border-outline-variant space-y-4">
+                            <!-- Equalizer Planet Themes -->
+                            <div class="grid gap-1.5 grid-cols-4 mt-2">
+                                <button id="btn-eq-earth" onclick="startEqualizerMode('earth')" class="eq-mode-btn h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant font-label-sm uppercase text-[9px]">Earth</button>
+                                <button id="btn-eq-mars" onclick="startEqualizerMode('mars')" class="eq-mode-btn h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant font-label-sm uppercase text-[9px]">Mars</button>
+                                <button id="btn-eq-jupiter" onclick="startEqualizerMode('jupiter')" class="eq-mode-btn h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant font-label-sm uppercase text-[9px]">Jupiter</button>
+                                <button id="btn-eq-saturn" onclick="startEqualizerMode('saturn')" class="eq-mode-btn h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant font-label-sm uppercase text-[9px]">Saturn</button>
+                                <button id="btn-eq-venus" onclick="startEqualizerMode('venus')" class="eq-mode-btn h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant font-label-sm uppercase text-[9px]">Venus</button>
+                                <button id="btn-eq-neptune" onclick="startEqualizerMode('neptune')" class="eq-mode-btn h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant font-label-sm uppercase text-[9px]">Neptune</button>
+                                <button id="btn-eq-pluto" onclick="startEqualizerMode('pluto')" class="eq-mode-btn h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant font-label-sm uppercase text-[9px]">Pluto</button>
+                                <button id="btn-eq-uranus" onclick="startEqualizerMode('uranus')" class="eq-mode-btn h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant font-label-sm uppercase text-[9px]">Uranus</button>
+                            </div>
+                            <div class="mt-2">
+                                <button id="btn-mic-toggle" class="w-full flex items-center justify-center gap-2 h-10 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant font-label-sm uppercase text-[11px]">
+                                    <span class="material-symbols-outlined text-[18px]" id="mic-icon">mic_off</span>
+                                    <span id="mic-btn-text" data-translate="mic-off-btn">Mic On</span>
+                                </button>
+                            </div>
+
+                            <!-- Custom Audio Player Section -->
+                            <div class="border border-outline-variant p-3 bg-surface-container-low rounded space-y-3">
+                                <div class="font-section-header text-[10px] tracking-wider text-outline uppercase">Audio Player</div>
+                                
+                                <!-- Playing Song Info -->
+                                <div id="player-track-info" class="text-[11px] text-primary truncate hidden">
+                                    No file loaded
+                                </div>
+
+                                <!-- Custom Controls -->
+                                <div class="flex items-center gap-3">
+                                    <button id="player-play-btn" class="w-8 h-8 flex items-center justify-center border border-outline-variant hover:bg-surface-container-high transition-colors text-primary rounded" disabled>
+                                        <span class="material-symbols-outlined text-[18px]">play_arrow</span>
+                                    </button>
+                                    
+                                    <!-- Progress Bar -->
+                                    <div class="flex-1 flex items-center gap-2">
+                                        <span id="player-time-current" class="font-value-mono text-[9px] text-outline">0:00</span>
+                                        <input type="range" id="player-progress" min="0" max="100" value="0" class="flex-1 h-1" disabled />
+                                        <span id="player-time-total" class="font-value-mono text-[9px] text-outline">0:00</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Volume Control -->
+                                <div class="flex items-center gap-2 px-1">
+                                    <span class="material-symbols-outlined text-[14px] text-on-surface-variant">volume_up</span>
+                                    <input type="range" id="player-volume" min="0" max="100" value="70" class="flex-1" />
+                                    <span id="player-volume-val" class="font-value-mono text-[10px] text-primary">70%</span>
+                                </div>
+
+                                <!-- Playlist Section -->
+                                <div class="mt-3 border-t border-outline-variant pt-3 space-y-2">
+                                    <div class="flex items-center justify-between">
+                                        <div class="text-[9px] text-outline font-section-header uppercase tracking-wider" data-translate="playlist-header">Playlist</div>
+                                        <input type="file" id="audio-file-input" accept="audio/*" class="hidden" multiple />
+                                    </div>
+                                    <div id="player-playlist" class="flex flex-col max-h-[220px] overflow-y-auto pr-1 bg-black border border-outline-variant rounded p-1.5 font-mono text-[10px] space-y-0.5">
+                                        <!-- Will be filled dynamically by JavaScript -->
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -399,10 +468,10 @@
                             class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-primary">style</span>
                         <span data-translate="presets-header" class="font-section-header text-section-header uppercase">Presets</span>
                     </div>
-                    <span class="chevron-icon material-symbols-outlined text-on-surface-variant text-[18px]"
+                    <span class="chevron-icon material-symbols-outlined text-on-surface-variant text-[18px] collapsed"
                         id="chevron-presets">expand_more</span>
                 </button>
-                <div class="accordion-content" id="content-presets">
+                <div class="accordion-content collapsed" id="content-presets">
                     <div class="accordion-inner">
                         <div class="px-panel-padding py-4 border-t border-outline-variant flex flex-wrap gap-2"
                             id="presets-container">
@@ -438,10 +507,10 @@
                             class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-primary">photo_library</span>
                         <span data-translate="library-header" class="font-section-header text-section-header uppercase">Library</span>
                     </div>
-                    <span class="chevron-icon material-symbols-outlined text-on-surface-variant text-[18px]"
+                    <span class="chevron-icon material-symbols-outlined text-on-surface-variant text-[18px] collapsed"
                         id="chevron-library">expand_more</span>
                 </button>
-                <div class="accordion-content" id="content-library">
+                <div class="accordion-content collapsed" id="content-library">
                     <div class="accordion-inner">
                         <div class="px-panel-padding py-4 border-t border-outline-variant">
                             <div class="grid grid-cols-3 gap-1">
@@ -494,6 +563,32 @@
         let preFullscreenWidth = 768;
         let preFullscreenHeight = 432; // 16:9 aspect ratio for 768 width
 
+        // Equalizer & Audio Player variables
+        let micStream = null;
+        let micActive = false;
+        let equalizerActive = false;
+        let equalizerAnimFrame = null;
+        let peakRow = Array(20).fill(0);
+        let peakHoldTime = Array(20).fill(0);
+        let colDisplayHeight = Array(20).fill(0);
+
+        // Playlist track registry
+        let playlist = [];
+        let currentPlaylistIndex = 0;
+        
+        // Hidden audio element for file playback
+        const audioPlayer = document.createElement('audio');
+
+        // Initialize AudioContext early to prevent late-binding source bug in browsers
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 256;
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+        const sourceFile = audioCtx.createMediaElementSource(audioPlayer);
+        sourceFile.connect(analyser);
+        analyser.connect(audioCtx.destination);
+        let sourceMic = null;
+
         // Multi-language Translation Engine (EN, RU, UA)
         let currentLang = localStorage.getItem('led-studio-lang') || 'en';
 
@@ -510,8 +605,11 @@
                 "blink-btn": "Blink",
                 "add-btn": "Add",
                 "save-btn": "Save",
-                "mixer-header": "Mixer",
-                "mixer-content": "Mixing controls are currently inactive.",
+                "equalizer-header": "Equalizer",
+                "equalizer-btn-1": "Equalizer 1",
+                "mic-on-btn": "Mic Off",
+                "mic-off-btn": "Mic On",
+                "upload-audio-btn": "Choose Audio File",
                 "presets-header": "Presets",
                 "preset-police": "POLICE",
                 "preset-tech": "TECH",
@@ -528,7 +626,9 @@
                 "size-label": "Text Size",
                 "color-label": "Text Color",
                 "save-video-btn": "Save Video",
-                "fullscreen-hint": "Double-click for fullscreen. Double-click again to exit."
+                "fullscreen-hint": "Double-click for fullscreen. Double-click again to exit.",
+                "playlist-header": "Playlist",
+                "add-track-item": "Add Track..."
             },
             ru: {
                 "adjustments-header": "Настройки",
@@ -542,8 +642,11 @@
                 "blink-btn": "Мерцание",
                 "add-btn": "Добавить",
                 "save-btn": "Сохранить",
-                "mixer-header": "Микшер",
-                "mixer-content": "Управление микшированием сейчас неактивно.",
+                "equalizer-header": "Эквалайзер",
+                "equalizer-btn-1": "Эквалайзер 1",
+                "mic-on-btn": "Выкл. микрофон",
+                "mic-off-btn": "Вкл. микрофон",
+                "upload-audio-btn": "Выбрать аудиофайл",
                 "presets-header": "Пресеты",
                 "preset-police": "ПОЛИЦИЯ",
                 "preset-tech": "ТЕХНИКА",
@@ -560,7 +663,9 @@
                 "size-label": "Размер текста",
                 "color-label": "Цвет текста",
                 "save-video-btn": "Сохранить видео",
-                "fullscreen-hint": "Дважды кликните для полноэкранного режима. Чтобы выйти, дважды кликните по экрану."
+                "fullscreen-hint": "Дважды кликните для полноэкранного режима. Чтобы выйти, дважды кликните по экрану.",
+                "playlist-header": "Плейлист",
+                "add-track-item": "Добавить трек..."
             },
             ua: {
                 "adjustments-header": "Налаштування",
@@ -574,8 +679,11 @@
                 "blink-btn": "Миготіння",
                 "add-btn": "Додати",
                 "save-btn": "Зберегти",
-                "mixer-header": "Мікшер",
-                "mixer-content": "Керування мікшуванням наразі неактивне.",
+                "equalizer-header": "Еквалайзер",
+                "equalizer-btn-1": "Еквалайзер 1",
+                "mic-on-btn": "Вимк. мікрофон",
+                "mic-off-btn": "Увімк. мікрофон",
+                "upload-audio-btn": "Вибрати аудіофайл",
                 "presets-header": "Пресети",
                 "preset-police": "ПОЛІЦІЯ",
                 "preset-tech": "ТЕХНІКА",
@@ -592,7 +700,9 @@
                 "size-label": "Розмір тексту",
                 "color-label": "Колір тексту",
                 "save-video-btn": "Зберегти відео",
-                "fullscreen-hint": "Двічі клікніть для повного екрану. Щоб вийти з повного екрану, двічі клікніть по екрану."
+                "fullscreen-hint": "Двічі клікніть для повного екрану. Щоб вийти з повного екрану, двічі клікніть по екрану.",
+                "playlist-header": "Плейлист",
+                "add-track-item": "Додати трек..."
             }
         };
 
@@ -701,6 +811,25 @@
                 stopMarquee();
             }
             marqueeActive = false;
+
+            // Stop equalizer if active
+            if (equalizerActive) {
+                equalizerActive = false;
+                if (equalizerAnimFrame) {
+                    cancelAnimationFrame(equalizerAnimFrame);
+                    equalizerAnimFrame = null;
+                }
+                const eqBtn = document.getElementById('btn-equalizer-mode');
+                if (eqBtn) {
+                    eqBtn.classList.remove('bg-primary', 'text-on-primary', 'border-primary');
+                    eqBtn.classList.add('border-outline-variant', 'text-on-surface-variant');
+                }
+                audioPlayer.pause();
+                stopMicrophone();
+                ledPanel.classList.remove('vibrating');
+                ledPanel.style.transform = '';
+                ledPanel.style.boxShadow = '';
+            }
 
             // Restore the LED panel clean layout
             ledPanel.innerHTML = '';
@@ -940,17 +1069,7 @@
             }
         }
 
-        // Initialize accordion states
-        window.addEventListener('DOMContentLoaded', () => {
-            ['mixer', 'presets', 'library', 'marquee'].forEach(id => {
-                const content = document.getElementById('content-' + id);
-                const chevron = document.getElementById('chevron-' + id);
-                if (content && chevron) {
-                    content.classList.add('collapsed');
-                    chevron.classList.add('collapsed');
-                }
-            });
-        });
+
 
         let isStrobe = false;
         let isBlink = false;
@@ -1389,17 +1508,497 @@
             }
         });
 
-        // Initial draw
+        // Audio Initialization
+        function initAudio() {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        let activeEqMode = 'earth';
+        let eqCols = 20;
+        let eqRows = 15;
+
+        const PLANETS = {
+            earth: { cols: 20, rows: 15, shape: 'rounded-[1px]', getRGB: (c, r, tr) => r < tr*0.6 ? [16,185,129] : (r < tr*0.8 ? [251,191,36] : [244,63,94]) },
+            mars: { cols: 24, rows: 12, shape: 'rounded-[2px]', getRGB: (c, r, tr) => r < tr*0.5 ? [239,68,68] : (r < tr*0.8 ? [249,115,22] : [234,179,8]) },
+            jupiter: { cols: 10, rows: 8, shape: 'rounded-[4px]', getRGB: (c, r, tr) => r < tr*0.4 ? [202,138,4] : (r < tr*0.7 ? [217,119,6] : [248,113,113]) },
+            saturn: { cols: 32, rows: 16, shape: 'rounded-full', getRGB: (c, r, tr) => r < tr*0.6 ? [253,224,71] : [254,240,138] },
+            venus: { cols: 16, rows: 20, shape: 'rounded-full', getRGB: (c, r, tr) => r < tr*0.5 ? [236,72,153] : [192,38,211] },
+            neptune: { cols: 28, rows: 14, shape: 'rounded-[1px]', getRGB: (c, r, tr) => r < tr*0.7 ? [14,165,233] : [6,182,212] },
+            pluto: { cols: 12, rows: 12, shape: 'rounded-full', getRGB: (c, r, tr) => [224,242,254] },
+            uranus: { cols: 36, rows: 18, shape: 'rounded-[2px]', getRGB: (c, r, tr) => r < tr*0.6 ? [20,184,166] : [45,212,191] }
+        };
+
+        // Start Equalizer Mode
+        function startEqualizerMode(mode) {
+            if (typeof mode !== 'string') mode = activeEqMode;
+            clearActivePreset();
+            equalizerActive = true;
+            activeEqMode = mode;
+
+            const config = PLANETS[mode] || PLANETS.earth;
+            eqCols = config.cols;
+            eqRows = config.rows;
+
+            // Highlight button
+            document.querySelectorAll('.eq-mode-btn').forEach(btn => {
+                btn.classList.add('border-outline-variant', 'text-on-surface-variant');
+                btn.classList.remove('bg-primary', 'text-on-primary', 'border-primary');
+            });
+            const activeBtn = document.getElementById('btn-eq-' + mode);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-primary', 'text-on-primary', 'border-primary');
+                activeBtn.classList.remove('border-outline-variant', 'text-on-surface-variant');
+            }
+
+            // Initialize context
+            initAudio();
+
+            let html = '<div class="w-full h-full flex justify-between items-stretch p-4 md:p-6 bg-black relative gap-[2px] md:gap-[4px]" style="background-color: #000000; box-sizing: border-box;">';
+            for (let c = 0; c < eqCols; c++) {
+                html += `<div class="flex flex-col-reverse justify-start gap-[2px] md:gap-[3px] flex-1 h-full" id="eq-col-${c}">`;
+                for (let r = 0; r < eqRows; r++) {
+                    const rgb = config.getRGB(c, r, eqRows);
+                    html += `<div class="eq-segment w-full ${config.shape}" style="opacity: 0.15; background-color: rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]}); height: ${100/eqRows}%;" data-col="${c}" data-row="${r}"></div>`;
+                }
+                html += '</div>';
+            }
+            html += '</div>';
+            ledPanel.innerHTML = html;
+
+            // Reset peak indicators & column display heights
+            peakRow = Array(eqCols).fill(0);
+            peakHoldTime = Array(eqCols).fill(0);
+            colDisplayHeight = Array(eqCols).fill(0);
+
+            // Start draw loop
+            if (equalizerAnimFrame) {
+                cancelAnimationFrame(equalizerAnimFrame);
+            }
+            drawEqualizer();
+        }
+
+        // Equalizer Render Loop
+        function drawEqualizer() {
+            if (!equalizerActive) return;
+            equalizerAnimFrame = requestAnimationFrame(drawEqualizer);
+
+            let isFakeData = (!micActive && (!audioPlayer.src || audioPlayer.paused || audioPlayer.ended));
+
+            if (analyser && dataArray) {
+                if (!isFakeData) {
+                    analyser.getByteFrequencyData(dataArray);
+                } else {
+                    for(let i=0; i<dataArray.length; i++) {
+                        let diff = (Math.random() - 0.5) * 40;
+                        if (Math.random() < 0.04) diff += Math.random() * 180; 
+                        let val = dataArray[i] + diff;
+                        dataArray[i] = Math.max(0, Math.min(255, val * 0.93));
+                    }
+                }
+
+                const binMapping = [];
+                for(let i=0; i<eqCols; i++) {
+                    let binIndex = Math.floor(Math.pow(i / Math.max(1, eqCols - 1), 1.8) * 90) + 1;
+                    if (binIndex >= dataArray.length) binIndex = dataArray.length - 1;
+                    binMapping.push(binIndex);
+                }
+
+                const baseOpacity = brightSlider.value / 100;
+                let activeCount = 0;
+                let activeR = 0, activeG = 0, activeB = 0;
+                let totalVolume = 0;
+                const config = PLANETS[activeEqMode];
+
+                for (let c = 0; c < eqCols; c++) {
+                    const bin = binMapping[c];
+                    let val = 0;
+
+                    if (c < Math.max(3, Math.floor(eqCols*0.2))) {
+                        val = dataArray[bin];
+                    } else {
+                        const windowSize = Math.min(5, Math.floor(c / 3));
+                        let sum = 0, count = 0;
+                        for (let k = bin - Math.floor(windowSize / 2); k <= bin + Math.floor(windowSize / 2); k++) {
+                            if (k >= 0 && k < dataArray.length) {
+                                sum += dataArray[k];
+                                count++;
+                            }
+                        }
+                        val = sum / (count || 1);
+                    }
+
+                    val = val * 0.65; 
+                    let boost = 1.0;
+                    if (c > Math.floor(eqCols * 0.25)) {
+                        boost = 1.0 + (c - Math.floor(eqCols * 0.25)) * 0.15;
+                    }
+                    val = val * boost;
+                    val = Math.min(255, val);
+                    totalVolume += val;
+
+                    const targetLitCount = Math.round((val / 255) * eqRows);
+
+                    if (targetLitCount > colDisplayHeight[c]) {
+                        colDisplayHeight[c] = targetLitCount;
+                    } else {
+                        colDisplayHeight[c] -= 0.65 * (15 / eqRows); 
+                        if (colDisplayHeight[c] < 0) colDisplayHeight[c] = 0;
+                    }
+
+                    const litCount = Math.round(colDisplayHeight[c]);
+
+                    if (litCount >= peakRow[c]) {
+                        peakRow[c] = litCount;
+                        peakHoldTime[c] = 22;
+                    } else {
+                        if (peakHoldTime[c] > 0) {
+                            peakHoldTime[c]--;
+                        } else {
+                            peakRow[c] = Math.max(0, peakRow[c] - (0.22 * (eqRows/15)));
+                        }
+                    }
+
+                    for (let r = 0; r < eqRows; r++) {
+                        const segment = ledPanel.querySelector(`.eq-segment[data-col="${c}"][data-row="${r}"]`);
+                        if (segment) {
+                            const isPeak = (r === Math.floor(peakRow[c]) - 1 && r > 0);
+                            if (r < litCount || isPeak) {
+                                const rgb = config.getRGB(c, r, eqRows);
+                                segment.style.opacity = baseOpacity;
+                                segment.style.boxShadow = `0 0 10px rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.85)`;
+                                
+                                const isVibratingSegment = (isPeak || (r === litCount - 1 && litCount > 0));
+                                if (isVibratingSegment && litCount >= (eqRows * 0.6)) {
+                                    segment.classList.add('eq-column-vibrating');
+                                } else {
+                                    segment.classList.remove('eq-column-vibrating');
+                                }
+                                
+                                activeR += rgb[0]; activeG += rgb[1]; activeB += rgb[2];
+                                activeCount++;
+                            } else {
+                                segment.classList.remove('eq-column-vibrating');
+                                segment.style.opacity = '0.15';
+                                segment.style.boxShadow = 'none';
+                            }
+                        }
+                    }
+                }
+
+                const avgVolume = totalVolume / eqCols;
+                const glowSize = 40 + (avgVolume / 255) * 140;
+
+                if (activeCount > 0) {
+                    const glowR = Math.round(activeR / activeCount);
+                    const glowG = Math.round(activeG / activeCount);
+                    const glowB = Math.round(activeB / activeCount);
+                    ledPanel.style.setProperty('--glow-color', `rgba(${glowR}, ${glowG}, ${glowB}, ${baseOpacity * 0.5})`);
+                    ledPanel.style.boxShadow = `0 0 ${glowSize}px rgba(${glowR}, ${glowG}, ${glowB}, ${baseOpacity * 0.6})`;
+                } else {
+                    const bgRGB = PLANETS[activeEqMode].getRGB(0, 0, eqRows);
+                    ledPanel.style.setProperty('--glow-color', `rgba(${bgRGB[0]}, ${bgRGB[1]}, ${bgRGB[2]}, ${baseOpacity * 0.1})`);
+                    ledPanel.style.boxShadow = `0 0 40px rgba(${bgRGB[0]}, ${bgRGB[1]}, ${bgRGB[2]}, ${baseOpacity * 0.15})`;
+                }
+            }
+        }
+
+        // Toggle Microphone
+        function toggleMicrophone() {
+            initAudio();
+
+            if (!micActive) {
+                micActive = true;
+                
+                // If audio player is playing, pause it to prevent clash
+                if (!audioPlayer.paused) {
+                    audioPlayer.pause();
+                }
+
+                navigator.mediaDevices.getUserMedia({ audio: true })
+                    .then(stream => {
+                        micStream = stream;
+                        sourceMic = audioCtx.createMediaStreamSource(stream);
+                        sourceMic.connect(analyser);
+
+                        // Update button style
+                        document.getElementById('mic-icon').textContent = 'mic';
+                        document.getElementById('mic-btn-text').setAttribute('data-translate', 'mic-on-btn');
+                        changeLanguage(currentLang);
+
+                        // Auto-start equalizer visualization if not running
+                        if (!equalizerActive) {
+                            startEqualizerMode();
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Mic access error:', err);
+                        micActive = false;
+                        alert('Could not access microphone: ' + err.message);
+                    });
+            } else {
+                stopMicrophone();
+            }
+        }
+
+        function stopMicrophone() {
+            if (micActive) {
+                micActive = false;
+                if (micStream) {
+                    micStream.getTracks().forEach(track => track.stop());
+                    micStream = null;
+                }
+                if (sourceMic) {
+                    sourceMic.disconnect();
+                    sourceMic = null;
+                }
+                document.getElementById('mic-icon').textContent = 'mic_off';
+                document.getElementById('mic-btn-text').setAttribute('data-translate', 'mic-off-btn');
+                changeLanguage(currentLang);
+            }
+        }
+
+        // Wire mic event
+        document.getElementById('btn-mic-toggle').addEventListener('click', toggleMicrophone);
+
+        // Setup Audio Player Event Listeners and Playlist management
+        const audioFileInput = document.getElementById('audio-file-input');
+        const playerPlayBtn = document.getElementById('player-play-btn');
+        const playerProgress = document.getElementById('player-progress');
+        const playerVolume = document.getElementById('player-volume');
+        const playerVolumeVal = document.getElementById('player-volume-val');
+        const playerTimeCurrent = document.getElementById('player-time-current');
+        const playerTimeTotal = document.getElementById('player-time-total');
+        const playerTrackInfo = document.getElementById('player-track-info');
+
+        // Render playlist tracks
+        function renderPlaylist() {
+            const playlistContainer = document.getElementById('player-playlist');
+            if (!playlistContainer) return;
+
+            playlistContainer.innerHTML = '';
+            playlist.forEach((track, index) => {
+                const item = document.createElement('div');
+                const isActive = (index === currentPlaylistIndex);
+                
+                item.className = `flex items-center justify-between py-1 px-1.5 rounded transition-colors cursor-pointer ${
+                    isActive 
+                        ? 'bg-surface-container-high text-[#10b981] font-bold' 
+                        : 'text-on-surface-variant hover:bg-surface-container-high'
+                }`;
+                
+                const title = document.createElement('span');
+                title.className = 'truncate flex-1 mr-2';
+                // Numbered format: 01. Name, 02. Name...
+                const trackNumber = String(index + 1).padStart(2, '0');
+                title.textContent = `${trackNumber}. ${track.name}`;
+                
+                const controlsContainer = document.createElement('div');
+                controlsContainer.className = 'flex items-center gap-1.5 shrink-0';
+
+                const playIcon = document.createElement('span');
+                playIcon.className = `material-symbols-outlined text-[13px] ${isActive ? 'text-[#10b981]' : 'text-outline-variant'}`;
+                playIcon.textContent = (isActive && !audioPlayer.paused) ? 'volume_up' : 'play_arrow';
+                
+                const deleteBtn = document.createElement('span');
+                deleteBtn.className = 'material-symbols-outlined text-[13px] text-outline-variant hover:text-red-500 transition-colors cursor-pointer';
+                deleteBtn.textContent = 'delete';
+                deleteBtn.title = 'Remove track';
+                
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // prevent selectTrack(index) on item click
+                    removeTrack(index);
+                });
+
+                controlsContainer.appendChild(playIcon);
+                controlsContainer.appendChild(deleteBtn);
+                
+                item.appendChild(title);
+                item.appendChild(controlsContainer);
+                
+                item.addEventListener('click', () => {
+                    selectTrack(index);
+                });
+                
+                playlistContainer.appendChild(item);
+            });
+
+            // "+ Add Track..." option at the bottom styled like a Winamp control
+            const addItem = document.createElement('div');
+            addItem.className = 'flex items-center justify-center gap-1.5 py-1 px-1.5 border border-dashed border-outline-variant hover:border-primary hover:bg-surface-container-high text-[#10b981]/80 hover:text-[#10b981] transition-colors text-[9px] mt-1.5 font-mono cursor-pointer';
+            
+            const addIcon = document.createElement('span');
+            addIcon.className = 'material-symbols-outlined text-[12px]';
+            addIcon.textContent = 'add';
+            
+            const addLabel = document.createElement('span');
+            addLabel.setAttribute('data-translate', 'add-track-item');
+            addLabel.textContent = translations[currentLang] && translations[currentLang]['add-track-item'] 
+                ? translations[currentLang]['add-track-item'] 
+                : 'Add Track...';
+            
+            addItem.appendChild(addIcon);
+            addItem.appendChild(addLabel);
+            
+            addItem.addEventListener('click', (e) => {
+                e.preventDefault();
+                audioFileInput.click();
+            });
+            playlistContainer.appendChild(addItem);
+        }
+
+        // Remove track from playlist
+        function removeTrack(index) {
+            playlist.splice(index, 1);
+            
+            if (playlist.length === 0) {
+                currentPlaylistIndex = 0;
+                audioPlayer.pause();
+                audioPlayer.src = '';
+                playerTrackInfo.textContent = 'No file loaded';
+                playerTrackInfo.classList.add('hidden');
+                playerPlayBtn.disabled = true;
+                playerProgress.disabled = true;
+                playerTimeCurrent.textContent = '0:00';
+                playerTimeTotal.textContent = '0:00';
+                playerProgress.value = 0;
+            } else {
+                if (index === currentPlaylistIndex) {
+                    const newIndex = Math.min(index, playlist.length - 1);
+                    selectTrack(newIndex);
+                } else if (index < currentPlaylistIndex) {
+                    currentPlaylistIndex--;
+                }
+            }
+            renderPlaylist();
+        }
+
+        // Select and play a track
+        function selectTrack(index) {
+            currentPlaylistIndex = index;
+            const track = playlist[index];
+            
+            audioPlayer.src = track.url;
+            audioPlayer.load();
+            
+            playerTrackInfo.textContent = track.name;
+            playerTrackInfo.classList.remove('hidden');
+            playerPlayBtn.disabled = false;
+            playerProgress.disabled = false;
+            
+            initAudio();
+
+
+            
+            stopMicrophone();
+            audioPlayer.play();
+            if (!equalizerActive) {
+                startEqualizerMode();
+            }
+            
+            renderPlaylist();
+        }
+
+        // Handle file uploads (supporting multiple files selection)
+        audioFileInput.addEventListener('change', function(e) {
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
+
+            let firstNewIndex = playlist.length;
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const url = URL.createObjectURL(file);
+                playlist.push({ name: file.name, url: url });
+            }
+            
+            selectTrack(firstNewIndex);
+        });
+
+        playerPlayBtn.addEventListener('click', function() {
+            initAudio();
+
+
+            if (audioPlayer.paused) {
+                stopMicrophone();
+                audioPlayer.play();
+                if (!equalizerActive) {
+                    startEqualizerMode();
+                }
+            } else {
+                audioPlayer.pause();
+            }
+        });
+
+        audioPlayer.addEventListener('play', () => {
+            playerPlayBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">pause</span>';
+            renderPlaylist();
+        });
+
+        audioPlayer.addEventListener('pause', () => {
+            playerPlayBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">play_arrow</span>';
+            renderPlaylist();
+        });
+
+        audioPlayer.addEventListener('timeupdate', () => {
+            if (audioPlayer.duration) {
+                const percent = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+                playerProgress.value = percent;
+                playerTimeCurrent.textContent = formatTime(audioPlayer.currentTime);
+            }
+        });
+
+        audioPlayer.addEventListener('loadedmetadata', () => {
+            playerTimeTotal.textContent = formatTime(audioPlayer.duration);
+        });
+
+        playerProgress.addEventListener('input', function() {
+            if (audioPlayer.duration) {
+                audioPlayer.currentTime = (this.value / 100) * audioPlayer.duration;
+            }
+        });
+
+        playerVolume.addEventListener('input', function() {
+            const vol = this.value / 100;
+            audioPlayer.volume = vol;
+            playerVolumeVal.textContent = this.value + "%";
+        });
+
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return "0:00";
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        // Initialize default track on load
+        function initPlaylist() {
+            if (playlist.length > 0) {
+                const track = playlist[0];
+                audioPlayer.src = track.url;
+                audioPlayer.load();
+                
+                playerTrackInfo.textContent = track.name;
+                playerTrackInfo.classList.remove('hidden');
+                playerPlayBtn.disabled = false;
+                playerProgress.disabled = false;
+            }
+            renderPlaylist();
+        }
+
+        // Initial draw & load
         updateLED();
+        initPlaylist();
 
         // Initialize translations to saved or default language
         changeLanguage(currentLang);
 
-        // Expand Marquee Control accordion by default
-        toggleAccordion('marquee');
 
-        // Automatically start the marquee on page load
-        startMarquee();
+
+        // Automatically start the marquee on page load after fonts are loaded
+        document.fonts.ready.then(() => {
+            startMarquee();
+        });
     </script>
 </body>
 

@@ -291,7 +291,7 @@ function toggleAccordion(id) {
 
 // Initialize accordion states
 window.addEventListener('DOMContentLoaded', () => {
-    ['mixer', 'presets', 'library', 'marquee'].forEach(id => {
+    ['equalizer', 'presets', 'library', 'marquee'].forEach(id => {
         const content = document.getElementById('content-' + id);
         const chevron = document.getElementById('chevron-' + id);
         if(content && chevron) {
