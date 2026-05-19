@@ -37,30 +37,62 @@ function getTempColor(tempValue) {
     return `rgb(${r}, ${g}, ${b})`;
 }
 
+// A helper to safely update ledPanel innerHTML without destroying the control panel in fullscreen
+function setLedHTML(html) {
+    let contentWrapper = document.getElementById('led-content-wrapper');
+    if (!contentWrapper) {
+        contentWrapper = document.createElement('div');
+        contentWrapper.id = 'led-content-wrapper';
+        contentWrapper.style.width = '100%';
+        contentWrapper.style.height = '100%';
+        contentWrapper.style.position = 'absolute';
+        contentWrapper.style.top = '0';
+        contentWrapper.style.left = '0';
+        contentWrapper.style.pointerEvents = 'none';
+        
+        const aside = document.querySelector('aside');
+        Array.from(ledPanel.childNodes).forEach(node => {
+            if (node !== aside) {
+                ledPanel.removeChild(node);
+            }
+        });
+        ledPanel.insertBefore(contentWrapper, ledPanel.firstChild);
+    }
+    contentWrapper.innerHTML = html;
+}
+
 // Clean up any running preset animations and reset buttons
 function clearActivePreset() {
+    let wasActive = false;
+    
     if (presetInterval) {
         clearInterval(presetInterval);
         presetInterval = null;
+        wasActive = true;
     }
+    if (currentPreset !== null) wasActive = true;
     currentPreset = null;
     
     // Stop marquee if active
     if (marqueeActive) {
         stopMarquee();
+        wasActive = true;
     }
     marqueeActive = false;
     
-    // Restore the LED panel clean layout
-    ledPanel.innerHTML = '';
-    ledPanel.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-    
-    // Reset active styles on all preset buttons
-    const presetButtons = document.querySelectorAll('#presets-container button');
-    presetButtons.forEach(btn => {
-        btn.classList.remove('bg-primary', 'text-on-primary', 'border-primary');
-        btn.classList.add('bg-surface-container-high', 'text-on-surface-variant', 'border-outline-variant');
-    });
+    // Only modify the DOM if a preset was actually running
+    if (wasActive) {
+        // Restore the LED panel clean layout
+        setLedHTML('');
+        ledPanel.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+        
+        // Reset active styles on all preset buttons
+        const presetButtons = document.querySelectorAll('#presets-container button');
+        presetButtons.forEach(btn => {
+            btn.classList.remove('bg-primary', 'text-on-primary', 'border-primary');
+            btn.classList.add('bg-surface-container-high', 'text-on-surface-variant', 'border-outline-variant');
+        });
+    }
 }
 
 // Preset 1: Police (Полиция) - Alternating red and blue double-flash strobe
@@ -76,12 +108,12 @@ function startPolicePreset() {
     ledPanel.style.backgroundColor = '#000000';
     
     // Setup side-by-side splits
-    ledPanel.innerHTML = `
+    setLedHTML(`
         <div class="w-full h-full flex" style="transition: none;">
             <div class="w-1/2 h-full" id="police-left" style="transition: none;"></div>
             <div class="w-1/2 h-full" id="police-right" style="transition: none;"></div>
         </div>
-    `;
+    `);
     
     const left = document.getElementById('police-left');
     const right = document.getElementById('police-right');
@@ -362,12 +394,12 @@ function startMarquee() {
     const textVal = document.getElementById('marquee-text').value.trim() || "LED STUDIO";
     
     // Set up LED matrix container and overlay inside the panel
-    ledPanel.innerHTML = `
+    setLedHTML(`
         <div class="led-matrix-container" id="marquee-container" style="background-color: #000000;">
             <div class="led-matrix-text" id="marquee-scroller"></div>
             <div class="led-matrix-overlay"></div>
         </div>
-    `;
+    `);
     
     const scroller = document.getElementById('marquee-scroller');
     scroller.textContent = textVal;
@@ -628,14 +660,72 @@ document.getElementById('marquee-bg-color-slider').addEventListener('input', upd
 
 document.getElementById('btn-marquee-save-video').addEventListener('click', saveMarqueeVideo);
 
+// Fullscreen and Control Panel logic
+let asideParent = null;
+let asideNextSibling = null;
+const asideElement = document.querySelector('aside');
+
+let isDraggingInsideAside = false;
+
+if (asideElement) {
+    asideElement.addEventListener('mousedown', () => { isDraggingInsideAside = true; });
+    asideElement.addEventListener('touchstart', () => { isDraggingInsideAside = true; }, { passive: true });
+}
+
+document.addEventListener('mouseup', () => { setTimeout(() => { isDraggingInsideAside = false; }, 0); });
+document.addEventListener('touchend', () => { setTimeout(() => { isDraggingInsideAside = false; }, 0); });
+
 // Double-click to toggle fullscreen mode
 ledPanel.addEventListener('dblclick', () => {
     if (!document.fullscreenElement) {
-        ledPanel.requestFullscreen().catch(err => {
+        ledPanel.requestFullscreen().then(() => {
+            if (asideElement) {
+                asideParent = asideElement.parentNode;
+                asideNextSibling = asideElement.nextSibling;
+                asideElement.style.position = 'absolute';
+                asideElement.style.right = '0';
+                asideElement.style.top = '0';
+                asideElement.style.height = '100%';
+                asideElement.style.zIndex = '1000';
+                asideElement.style.display = 'none'; // Hidden initially
+                ledPanel.appendChild(asideElement);
+            }
+        }).catch(err => {
             console.error(`Ошибка при переходе в полноэкранный режим: ${err.message}`);
         });
     } else {
         document.exitFullscreen();
+    }
+});
+
+document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement && asideParent && asideElement) {
+        // Restore aside
+        asideElement.style.position = '';
+        asideElement.style.right = '';
+        asideElement.style.top = '';
+        asideElement.style.height = '';
+        asideElement.style.zIndex = '';
+        asideElement.style.display = '';
+        asideParent.insertBefore(asideElement, asideNextSibling);
+        asideParent = null;
+        asideNextSibling = null;
+    }
+});
+
+// Single tap/click on screen reveals control panel in fullscreen
+ledPanel.addEventListener('click', (e) => {
+    if (document.fullscreenElement && asideElement) {
+        if (isDraggingInsideAside) return;
+        
+        // Ignore clicks inside the aside panel
+        if (asideElement.contains(e.target)) return;
+        
+        if (asideElement.style.display === 'none') {
+            asideElement.style.display = 'flex';
+        } else {
+            asideElement.style.display = 'none';
+        }
     }
 });
 

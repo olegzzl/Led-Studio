@@ -42,17 +42,33 @@ input[type=range]:hover::-webkit-slider-thumb {
 
 /* Animations */
 @keyframes strobe {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.1; }
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.1;
+    }
 }
+
 .animate-strobe {
     animation: strobe 0.1s infinite;
 }
 
 @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
 }
+
 .animate-blink {
     animation: blink 0.8s infinite;
 }
@@ -61,12 +77,15 @@ input[type=range]:hover::-webkit-slider-thumb {
 ::-webkit-scrollbar {
     width: 4px;
 }
+
 ::-webkit-scrollbar-track {
     background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
     background: #353535;
 }
+
 ::-webkit-scrollbar-thumb:hover {
     background: #444748;
 }
@@ -77,9 +96,11 @@ input[type=range]:hover::-webkit-slider-thumb {
         height: 32px;
         touch-action: manipulation;
     }
+
     input[type=range]::-webkit-slider-runnable-track {
         height: 4px;
     }
+
     input[type=range]::-webkit-slider-thumb {
         height: 24px;
         width: 16px;
@@ -150,7 +171,7 @@ input[type=range]:hover::-webkit-slider-thumb {
 }
 
 /* Fullscreen mode styling for LED Panel */
-#led-panel:fullscreen {
+#led-wrapper:fullscreen {
     width: 100vw !important;
     height: 100vh !important;
     max-width: none !important;
@@ -158,40 +179,89 @@ input[type=range]:hover::-webkit-slider-thumb {
     border: none !important;
     border-radius: 0 !important;
     box-shadow: none !important;
+    background-color: #000000 !important;
+}
+
+#led-wrapper:fullscreen #led-panel {
+    width: 100% !important;
+    height: 100% !important;
+    border: none !important;
+    border-radius: 0 !important;
 }
 
 /* Ensure matrix text and styling adapts nicely on large display monitors */
-#led-panel:fullscreen .led-matrix-text {
+#led-wrapper:fullscreen .led-matrix-text {
     font-size: 14vw !important;
     letter-spacing: 4px !important;
 }
 
-#led-panel:fullscreen .led-matrix-overlay {
-    background-size: 10px 10px !important; /* Scale up spacing for crisp matrix dot presentation */
+#led-wrapper:fullscreen .led-matrix-overlay {
+    background-size: 10px 10px !important;
+    /* Scale up spacing for crisp matrix dot presentation */
 }
 
 /* Equalizer Visualizer Styles */
 .eq-led {
     transition: opacity 0.04s ease, box-shadow 0.04s ease;
 }
+
 .eq-led-green {
-    background-color: #10b981; /* emerald-500 */
+    background-color: #10b981;
+    /* emerald-500 */
 }
+
 .eq-led-green.active {
     opacity: 1 !important;
     box-shadow: 0 0 10px rgba(16, 185, 129, 0.85);
 }
+
 .eq-led-yellow {
-    background-color: #fbbf24; /* amber-400 */
+    background-color: #fbbf24;
+    /* amber-400 */
 }
+
 .eq-led-yellow.active {
     opacity: 1 !important;
     box-shadow: 0 0 10px rgba(251, 191, 36, 0.85);
 }
+
 .eq-led-red {
-    background-color: #f43f5e; /* rose-500 */
+    background-color: #f43f5e;
+    /* rose-500 */
 }
+
 .eq-led-red.active {
     opacity: 1 !important;
     box-shadow: 0 0 12px rgba(244, 63, 94, 0.95);
+}
+
+/* Player Controls */
+.player-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    padding: 10px;
+}
+
+.control-btn {
+    background: transparent;
+    border: none;
+    color: #e5e2e1;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.control-btn:hover {
+    background-color: #353535;
+    color: #ffffff;
+}
+
+.control-btn .material-symbols-outlined {
+    font-size: 32px;
 }
