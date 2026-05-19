@@ -40,6 +40,10 @@ input[type=range]:hover::-webkit-slider-thumb {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 0 80px var(--glow-color, rgba(255, 255, 255, 0.1));
     touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 /* Animations */
