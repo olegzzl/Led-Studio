@@ -713,6 +713,15 @@ document.addEventListener('fullscreenchange', () => {
     }
 });
 
+// Auto-hide control panel if window becomes too narrow (mobile portrait)
+window.addEventListener('resize', () => {
+    if (document.fullscreenElement && asideElement && window.innerWidth < 768) {
+        if (asideElement.style.display === 'flex') {
+            asideElement.style.display = 'none';
+        }
+    }
+});
+
 // Single tap/click on screen reveals control panel in fullscreen
 ledPanel.addEventListener('click', (e) => {
     if (document.fullscreenElement && asideElement) {
@@ -722,7 +731,11 @@ ledPanel.addEventListener('click', (e) => {
         if (asideElement.contains(e.target)) return;
         
         if (asideElement.style.display === 'none') {
-            asideElement.style.display = 'flex';
+            // Only show if the screen is wide enough (>= 768px)
+            // This prevents the control panel from taking 100% width and trapping the user on mobile portrait
+            if (window.innerWidth >= 768) {
+                asideElement.style.display = 'flex';
+            }
         } else {
             asideElement.style.display = 'none';
         }
