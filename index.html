@@ -3388,7 +3388,72 @@
         // Initialize translations to saved or default language
         changeLanguage(currentLang);
 
+        // Mobile range inputs touch helper: prevent jump-to-tap, allow only thumb dragging
+        let activeSlider = null;
+        let preTouchValue = null;
+        let isDraggingThumb = false;
 
+        document.addEventListener('touchstart', (e) => {
+            if (e.target.tagName === 'INPUT' && e.target.type === 'range') {
+                const input = e.target;
+                const rect = input.getBoundingClientRect();
+                const touch = e.touches[0];
+                const touchX = touch.clientX - rect.left;
+                
+                const min = parseFloat(input.min) || 0;
+                const max = parseFloat(input.max) || 100;
+                const val = parseFloat(input.value) || 0;
+                const pct = (val - min) / (max - min);
+                const thumbX = pct * rect.width;
+                
+                const threshold = 35; // px hit target around thumb center
+                
+                if (Math.abs(touchX - thumbX) <= threshold) {
+                    isDraggingThumb = true;
+                } else {
+                    isDraggingThumb = false;
+                    preTouchValue = input.value;
+                    activeSlider = input;
+                }
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchmove', (e) => {
+            if (activeSlider && !isDraggingThumb) {
+                if (activeSlider.value !== preTouchValue) {
+                    activeSlider.value = preTouchValue;
+                }
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchend', () => {
+            activeSlider = null;
+            isDraggingThumb = false;
+        }, { passive: true });
+
+        document.addEventListener('touchcancel', () => {
+            activeSlider = null;
+            isDraggingThumb = false;
+        }, { passive: true });
+
+        // Capture event phase listener to block any value change event if not dragging thumb
+        document.addEventListener('input', (e) => {
+            if (e.target.tagName === 'INPUT' && e.target.type === 'range') {
+                if (activeSlider === e.target && !isDraggingThumb) {
+                    e.target.value = preTouchValue;
+                    e.stopImmediatePropagation();
+                }
+            }
+        }, true);
+
+        document.addEventListener('change', (e) => {
+            if (e.target.tagName === 'INPUT' && e.target.type === 'range') {
+                if (activeSlider === e.target && !isDraggingThumb) {
+                    e.target.value = preTouchValue;
+                    e.stopImmediatePropagation();
+                }
+            }
+        }, true);
 
         // Automatically start the marquee on page load after fonts are loaded
         document.fonts.ready.then(() => {
