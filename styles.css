@@ -204,14 +204,7 @@ input[type=range]:hover::-webkit-slider-thumb {
 /* Ensure matrix text and styling adapts nicely on large display monitors */
 #led-wrapper:fullscreen .led-matrix-text,
 #led-wrapper.ios-fullscreen-fallback .led-matrix-text {
-    font-size: 14vw !important;
     letter-spacing: 4px !important;
-}
-
-#led-wrapper:fullscreen .led-matrix-overlay,
-#led-wrapper.ios-fullscreen-fallback .led-matrix-overlay {
-    background-size: 10px 10px !important;
-    /* Scale up spacing for crisp matrix dot presentation */
 }
 
 /* Equalizer Visualizer Styles */

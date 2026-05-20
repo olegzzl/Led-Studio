@@ -1,0 +1,598 @@
+diff --git a/index.html b/index.html
+index 35f0981..1407cc2 100644
+--- a/index.html
++++ b/index.html
+@@ -174,9 +174,8 @@
+     </header>
+ 
+     <main class="flex flex-col flex-1 relative md:flex-row h-[calc(100vh-48px)] overflow-hidden">
+-        <!-- Main Viewport: LED Display -->
+         <section
+-            class="w-full h-[35vh] md:h-auto shrink-0 md:flex-1 flex flex-col items-center justify-center p-4 md:p-12 lg:p-24 bg-background relative z-10">
++            class="w-full h-[35vh] shrink-0 md:w-auto md:h-auto md:flex-1 flex flex-col items-center justify-center p-4 md:p-12 lg:p-24 bg-background relative z-10 md:overflow-y-auto">
+             <div class="w-full max-w-3xl aspect-video rounded-lg border border-outline-variant relative overflow-hidden cursor-pointer"
+                 id="led-panel" style="background-color: #FFFFFF;"></div>
+             <div data-translate="fullscreen-hint" class="hidden md:block mt-3 text-on-surface-variant font-label-sm text-[8px] text-center opacity-50 select-none max-w-lg cursor-default"
+@@ -195,7 +194,7 @@
+ 
+         <!-- Right Sidebar (Controls) -->
+         <aside
+-            class="w-full flex-1 md:w-[320px] lg:w-[360px] md:shrink-0 bg-surface-container-low border-t md:border-t-0 md:border-l border-outline-variant flex flex-col overflow-y-auto">
++            class="w-full flex-1 md:w-sidebar-width bg-surface-container-low border-t md:border-t-0 md:border-l border-outline-variant flex flex-col md:flex-none md:h-full overflow-y-auto md:shrink-0">
+ 
+             <!-- Adjustments Section -->
+             <div class="flex flex-col border-b border-outline-variant">
+@@ -419,6 +418,40 @@
+                                 </button>
+                             </div>
+ 
++                            <!-- Custom Grid Settings -->
++                            <div class="border border-outline-variant p-3 bg-surface-container-low rounded space-y-3 mt-2">
++                                <div class="font-section-header text-[10px] tracking-wider text-outline uppercase">Custom Grid</div>
++                                
++                                <div class="flex flex-col gap-1">
++                                    <div class="flex justify-between items-center px-1">
++                                        <span class="font-label-sm text-on-surface-variant uppercase text-[10px]">Columns</span>
++                                        <span class="font-value-mono text-primary text-[10px]" id="eq-cols-val">20</span>
++                                    </div>
++                                    <input class="w-full" id="eq-cols-slider" max="64" min="4" step="1" type="range" value="20" />
++                                </div>
++                                <div class="flex flex-col gap-1">
++                                    <div class="flex justify-between items-center px-1">
++                                        <span class="font-label-sm text-on-surface-variant uppercase text-[10px]">Rows</span>
++                                        <span class="font-value-mono text-primary text-[10px]" id="eq-rows-val">15</span>
++                                    </div>
++                                    <input class="w-full" id="eq-rows-slider" max="48" min="4" step="1" type="range" value="15" />
++                                </div>
++                                <div class="flex flex-col gap-1">
++                                    <div class="flex justify-between items-center px-1">
++                                        <span class="font-label-sm text-on-surface-variant uppercase text-[10px]">Horizontal Gap</span>
++                                        <span class="font-value-mono text-primary text-[10px]" id="eq-col-gap-val">4px</span>
++                                    </div>
++                                    <input class="w-full" id="eq-col-gap-slider" max="24" min="0" step="1" type="range" value="4" />
++                                </div>
++                                <div class="flex flex-col gap-1">
++                                    <div class="flex justify-between items-center px-1">
++                                        <span class="font-label-sm text-on-surface-variant uppercase text-[10px]">Vertical Gap</span>
++                                        <span class="font-value-mono text-primary text-[10px]" id="eq-row-gap-val">3px</span>
++                                    </div>
++                                    <input class="w-full" id="eq-row-gap-slider" max="24" min="0" step="1" type="range" value="3" />
++                                </div>
++                            </div>
++
+                             <!-- Custom Audio Player Section -->
+                             <div class="border border-outline-variant p-3 bg-surface-container-low rounded space-y-3">
+                                 <div class="font-section-header text-[10px] tracking-wider text-outline uppercase">Audio Player</div>
+@@ -429,13 +462,24 @@
+                                 </div>
+ 
+                                 <!-- Custom Controls -->
+-                                <div class="flex items-center gap-3">
+-                                    <button id="player-play-btn" class="w-8 h-8 flex items-center justify-center border border-outline-variant hover:bg-surface-container-high transition-colors text-primary rounded" disabled>
+-                                        <span class="material-symbols-outlined text-[18px]">play_arrow</span>
+-                                    </button>
++                                <div class="flex flex-col gap-2">
++                                    <div class="flex items-center justify-center gap-3">
++                                        <button id="player-prev-btn" class="w-8 h-8 flex items-center justify-center border border-outline-variant hover:bg-surface-container-high transition-colors text-primary rounded" disabled>
++                                            <span class="material-symbols-outlined text-[18px]">skip_previous</span>
++                                        </button>
++                                        <button id="player-play-btn" class="w-8 h-8 flex items-center justify-center border border-outline-variant hover:bg-surface-container-high transition-colors text-primary rounded" disabled>
++                                            <span class="material-symbols-outlined text-[18px]">play_arrow</span>
++                                        </button>
++                                        <button id="player-stop-btn" class="w-8 h-8 flex items-center justify-center border border-outline-variant hover:bg-surface-container-high transition-colors text-primary rounded" disabled>
++                                            <span class="material-symbols-outlined text-[18px]">stop</span>
++                                        </button>
++                                        <button id="player-next-btn" class="w-8 h-8 flex items-center justify-center border border-outline-variant hover:bg-surface-container-high transition-colors text-primary rounded" disabled>
++                                            <span class="material-symbols-outlined text-[18px]">skip_next</span>
++                                        </button>
++                                    </div>
+                                     
+                                     <!-- Progress Bar -->
+-                                    <div class="flex-1 flex items-center gap-2">
++                                    <div class="flex items-center gap-2 w-full">
+                                         <span id="player-time-current" class="font-value-mono text-[9px] text-outline">0:00</span>
+                                         <input type="range" id="player-progress" min="0" max="100" value="0" class="flex-1 h-1" disabled />
+                                         <span id="player-time-total" class="font-value-mono text-[9px] text-outline">0:00</span>
+@@ -809,23 +853,53 @@
+             return `rgb(${r}, ${g}, ${b})`;
+         }
+ 
++        // A helper to safely update ledPanel innerHTML without destroying the control panel in fullscreen
++        function setLedHTML(html) {
++            let contentWrapper = document.getElementById('led-content-wrapper');
++            if (!contentWrapper) {
++                contentWrapper = document.createElement('div');
++                contentWrapper.id = 'led-content-wrapper';
++                contentWrapper.style.width = '100%';
++                contentWrapper.style.height = '100%';
++                contentWrapper.style.position = 'absolute';
++                contentWrapper.style.top = '0';
++                contentWrapper.style.left = '0';
++                contentWrapper.style.pointerEvents = 'none';
++                
++                const aside = document.querySelector('aside');
++                Array.from(ledPanel.childNodes).forEach(node => {
++                    if (node !== aside) {
++                        ledPanel.removeChild(node);
++                    }
++                });
++                ledPanel.insertBefore(contentWrapper, ledPanel.firstChild);
++            }
++            contentWrapper.innerHTML = html;
++        }
++
+         // Clean up any running preset animations and reset buttons
+         function clearActivePreset() {
++            let wasActive = false;
++
+             if (presetInterval) {
+                 clearInterval(presetInterval);
+                 presetInterval = null;
++                wasActive = true;
+             }
++            if (currentPreset !== null) wasActive = true;
+             currentPreset = null;
+ 
+             // Stop marquee if active
+             if (marqueeActive) {
+                 stopMarquee();
++                wasActive = true;
+             }
+             marqueeActive = false;
+ 
+             // Stop equalizer if active
+             if (equalizerActive) {
+                 equalizerActive = false;
++                wasActive = true;
+                 if (equalizerAnimFrame) {
+                     cancelAnimationFrame(equalizerAnimFrame);
+                     equalizerAnimFrame = null;
+@@ -842,16 +916,19 @@
+                 ledPanel.style.boxShadow = '';
+             }
+ 
+-            // Restore the LED panel clean layout
+-            ledPanel.innerHTML = '';
+-            ledPanel.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+-
+-            // Reset active styles on all preset buttons
+-            const presetButtons = document.querySelectorAll('#presets-container button');
+-            presetButtons.forEach(btn => {
+-                btn.classList.remove('bg-primary', 'text-on-primary', 'border-primary');
+-                btn.classList.add('bg-surface-container-high', 'text-on-surface-variant', 'border-outline-variant');
+-            });
++            // Only modify the DOM if a preset was actually running
++            if (wasActive) {
++                // Restore the LED panel clean layout
++                setLedHTML('');
++                ledPanel.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
++
++                // Reset active styles on all preset buttons
++                const presetButtons = document.querySelectorAll('#presets-container button');
++                presetButtons.forEach(btn => {
++                    btn.classList.remove('bg-primary', 'text-on-primary', 'border-primary');
++                    btn.classList.add('bg-surface-container-high', 'text-on-surface-variant', 'border-outline-variant');
++                });
++            }
+         }
+ 
+         // Preset 1: Police (Полиция) - Alternating red and blue double-flash strobe
+@@ -867,12 +944,12 @@
+             ledPanel.style.backgroundColor = '#000000';
+ 
+             // Setup side-by-side splits
+-            ledPanel.innerHTML = `
++            setLedHTML(`
+                 <div class="w-full h-full flex" style="transition: none;">
+                     <div class="w-1/2 h-full" id="police-left" style="transition: none;"></div>
+                     <div class="w-1/2 h-full" id="police-right" style="transition: none;"></div>
+                 </div>
+-            `;
++            `);
+ 
+             const left = document.getElementById('police-left');
+             const right = document.getElementById('police-right');
+@@ -1225,12 +1302,12 @@
+             document.getElementById('btn-marquee-stop').classList.add('bg-surface-container-high', 'text-on-surface-variant');
+ 
+             // Set up LED matrix container and overlay inside the panel
+-            ledPanel.innerHTML = `
++            setLedHTML(`
+                 <div class="led-matrix-container" id="marquee-container" style="background-color: #000000;">
+                     <div class="led-matrix-text flex flex-col items-center justify-center text-center gap-1" id="marquee-scroller"></div>
+                     <div class="led-matrix-overlay"></div>
+                 </div>
+-            `;
++            `);
+ 
+             updateMarqueeText();
+ 
+@@ -1508,10 +1585,37 @@
+ 
+         document.getElementById('btn-marquee-save-video').addEventListener('click', saveMarqueeVideo);
+ 
++        // Fullscreen and Control Panel logic
++        let asideParent = null;
++        let asideNextSibling = null;
++        const asideElement = document.querySelector('aside');
++
++        let isDraggingInsideAside = false;
++        
++        // Prevent click events on the main panel if they originated as a drag from inside the control panel
++        if (asideElement) {
++            asideElement.addEventListener('mousedown', () => { isDraggingInsideAside = true; });
++            asideElement.addEventListener('touchstart', () => { isDraggingInsideAside = true; }, { passive: true });
++        }
++        
++        document.addEventListener('mouseup', () => { setTimeout(() => { isDraggingInsideAside = false; }, 0); });
++        document.addEventListener('touchend', () => { setTimeout(() => { isDraggingInsideAside = false; }, 0); });
++
+         // Double-click to toggle fullscreen mode
+         ledPanel.addEventListener('dblclick', () => {
+             if (!document.fullscreenElement) {
+-                ledPanel.requestFullscreen().catch(err => {
++                ledPanel.requestFullscreen().then(() => {
++                    asideParent = asideElement.parentNode;
++                    asideNextSibling = asideElement.nextSibling;
++                    asideElement.style.position = 'absolute';
++                    asideElement.style.right = '0';
++                    asideElement.style.top = '0';
++                    asideElement.style.height = '100%';
++                    asideElement.style.zIndex = '1000';
++                    asideElement.style.display = 'flex'; // Visible by default on enter, or maybe hidden? user said: a single tap reveals.
++                    asideElement.style.display = 'none'; // Hidden initially
++                    ledPanel.appendChild(asideElement);
++                }).catch(err => {
+                     console.error(`Ошибка при переходе в полноэкранный режим: ${err.message}`);
+                 });
+             } else {
+@@ -1519,6 +1623,37 @@
+             }
+         });
+ 
++        document.addEventListener('fullscreenchange', () => {
++            if (!document.fullscreenElement && asideParent) {
++                // Restore aside
++                asideElement.style.position = '';
++                asideElement.style.right = '';
++                asideElement.style.top = '';
++                asideElement.style.height = '';
++                asideElement.style.zIndex = '';
++                asideElement.style.display = '';
++                asideParent.insertBefore(asideElement, asideNextSibling);
++                asideParent = null;
++                asideNextSibling = null;
++            }
++        });
++
++        // Single tap/click on screen reveals control panel in fullscreen
++        ledPanel.addEventListener('click', (e) => {
++            if (document.fullscreenElement) {
++                if (isDraggingInsideAside) return;
++                
++                // Ignore clicks inside the aside panel
++                if (asideElement && asideElement.contains(e.target)) return;
++                
++                if (asideElement.style.display === 'none') {
++                    asideElement.style.display = 'flex';
++                } else {
++                    asideElement.style.display = 'none';
++                }
++            }
++        });
++
+         // Audio Initialization
+         function initAudio() {
+             if (audioCtx.state === 'suspended') {
+@@ -1529,18 +1664,120 @@
+         let activeEqMode = 'earth';
+         let eqCols = 20;
+         let eqRows = 15;
++        let eqColGap = 4;
++        let eqRowGap = 3;
++        let updatingSlidersFromCode = false;
+ 
+         const PLANETS = {
+-            earth: { cols: 20, rows: 15, shape: 'rounded-[1px]', getRGB: (c, r, tr) => r < tr*0.6 ? [16,185,129] : (r < tr*0.8 ? [251,191,36] : [244,63,94]) },
+-            mars: { cols: 24, rows: 12, shape: 'rounded-[2px]', getRGB: (c, r, tr) => r < tr*0.5 ? [239,68,68] : (r < tr*0.8 ? [249,115,22] : [234,179,8]) },
+-            jupiter: { cols: 10, rows: 8, shape: 'rounded-[4px]', getRGB: (c, r, tr) => r < tr*0.4 ? [202,138,4] : (r < tr*0.7 ? [217,119,6] : [248,113,113]) },
+-            saturn: { cols: 32, rows: 16, shape: 'rounded-full', getRGB: (c, r, tr) => r < tr*0.6 ? [253,224,71] : [254,240,138] },
+-            venus: { cols: 16, rows: 20, shape: 'rounded-full', getRGB: (c, r, tr) => r < tr*0.5 ? [236,72,153] : [192,38,211] },
+-            neptune: { cols: 28, rows: 14, shape: 'rounded-[1px]', getRGB: (c, r, tr) => r < tr*0.7 ? [14,165,233] : [6,182,212] },
+-            pluto: { cols: 12, rows: 12, shape: 'rounded-full', getRGB: (c, r, tr) => [224,242,254] },
+-            uranus: { cols: 36, rows: 18, shape: 'rounded-[2px]', getRGB: (c, r, tr) => r < tr*0.6 ? [20,184,166] : [45,212,191] }
++            earth: { cols: 20, rows: 15, colGap: 4, rowGap: 3, shape: 'rounded-[1px]', getRGB: (c, r, tr) => r < tr*0.6 ? [16,185,129] : (r < tr*0.8 ? [251,191,36] : [244,63,94]) },
++            mars: { cols: 24, rows: 12, colGap: 3, rowGap: 2, shape: 'rounded-[2px]', getRGB: (c, r, tr) => r < tr*0.5 ? [239,68,68] : (r < tr*0.8 ? [249,115,22] : [234,179,8]) },
++            jupiter: { cols: 10, rows: 8, colGap: 6, rowGap: 5, shape: 'rounded-[4px]', getRGB: (c, r, tr) => r < tr*0.4 ? [202,138,4] : (r < tr*0.7 ? [217,119,6] : [248,113,113]) },
++            saturn: { cols: 32, rows: 16, colGap: 2, rowGap: 2, shape: 'rounded-full', getRGB: (c, r, tr) => r < tr*0.6 ? [253,224,71] : [254,240,138] },
++            venus: { cols: 16, rows: 20, colGap: 4, rowGap: 4, shape: 'rounded-full', getRGB: (c, r, tr) => r < tr*0.5 ? [236,72,153] : [192,38,211] },
++            neptune: { cols: 28, rows: 14, colGap: 3, rowGap: 2, shape: 'rounded-[1px]', getRGB: (c, r, tr) => r < tr*0.7 ? [14,165,233] : [6,182,212] },
++            pluto: { cols: 12, rows: 12, colGap: 5, rowGap: 5, shape: 'rounded-full', getRGB: (c, r, tr) => [224,242,254] },
++            uranus: { cols: 36, rows: 18, colGap: 2, rowGap: 2, shape: 'rounded-[2px]', getRGB: (c, r, tr) => r < tr*0.6 ? [20,184,166] : [45,212,191] }
+         };
+ 
++        function rebuildEqualizerGrid() {
++            const config = PLANETS[activeEqMode] || PLANETS.earth;
++            let contentWrapper = document.getElementById('led-content-wrapper');
++            let mainContainer = contentWrapper ? contentWrapper.querySelector('.w-full.h-full.flex.bg-black') : null;
++            
++            // If the main container doesn't exist, build from scratch
++            if (!mainContainer) {
++                let html = `<div class="w-full h-full flex justify-between items-stretch p-4 md:p-6 bg-black relative eq-main-container" style="background-color: #000000; box-sizing: border-box; gap: ${eqColGap}px;">`;
++                for (let c = 0; c < eqCols; c++) {
++                    html += `<div class="flex flex-col-reverse justify-start flex-1 h-full eq-col-container" id="eq-col-${c}" style="gap: ${eqRowGap}px;">`;
++                    for (let r = 0; r < eqRows; r++) {
++                        const rgb = config.getRGB(c, r, eqRows);
++                        html += `<div class="eq-segment w-full ${config.shape}" style="opacity: 0.15; background-color: rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]}); height: ${100/eqRows}%;" data-col="${c}" data-row="${r}"></div>`;
++                    }
++                    html += '</div>';
++                }
++                html += '</div>';
++                setLedHTML(html);
++                
++                peakRow = Array(eqCols).fill(0);
++                peakHoldTime = Array(eqCols).fill(0);
++                colDisplayHeight = Array(eqCols).fill(0);
++                return;
++            }
++            
++            // Incremental DOM update for extremely fast slider interactions
++            mainContainer.style.gap = eqColGap + 'px';
++            
++            let currentCols = mainContainer.children.length;
++            
++            // Adjust Columns
++            while (currentCols > eqCols) {
++                mainContainer.removeChild(mainContainer.lastChild);
++                currentCols--;
++            }
++            
++            while (currentCols < eqCols) {
++                let colDiv = document.createElement('div');
++                colDiv.className = `flex flex-col-reverse justify-start flex-1 h-full eq-col-container`;
++                colDiv.id = `eq-col-${currentCols}`;
++                colDiv.style.gap = eqRowGap + 'px';
++                mainContainer.appendChild(colDiv);
++                currentCols++;
++            }
++            
++            // Adjust Rows in ALL Columns and update styles
++            for (let c = 0; c < currentCols; c++) {
++                let colDiv = mainContainer.children[c];
++                colDiv.style.gap = eqRowGap + 'px';
++                
++                let currentRows = colDiv.children.length;
++                
++                // Add or update rows
++                for (let r = 0; r < Math.max(currentRows, eqRows); r++) {
++                    if (r >= eqRows) {
++                        // Remove excess rows
++                        colDiv.removeChild(colDiv.lastChild);
++                    } else if (r >= currentRows) {
++                        // Add missing rows
++                        let seg = document.createElement('div');
++                        seg.className = `eq-segment w-full ${config.shape}`;
++                        seg.dataset.col = c;
++                        seg.dataset.row = r;
++                        const rgb = config.getRGB(c, r, eqRows);
++                        seg.style.backgroundColor = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
++                        seg.style.opacity = '0.15';
++                        seg.style.height = `${100/eqRows}%`;
++                        colDiv.appendChild(seg);
++                    } else {
++                        // Update existing rows
++                        let seg = colDiv.children[r];
++                        seg.className = `eq-segment w-full ${config.shape}`;
++                        seg.dataset.col = c;
++                        seg.dataset.row = r;
++                        const rgb = config.getRGB(c, r, eqRows);
++                        seg.style.backgroundColor = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
++                        seg.style.height = `${100/eqRows}%`;
++                    }
++                }
++            }
++            
++            // Adjust peak arrays safely
++            if (peakRow.length !== eqCols) {
++                let newPeakRow = Array(eqCols).fill(0);
++                let newPeakHoldTime = Array(eqCols).fill(0);
++                let newColHeight = Array(eqCols).fill(0);
++                
++                for(let i=0; i<Math.min(eqCols, peakRow.length); i++) {
++                    newPeakRow[i] = peakRow[i];
++                    newPeakHoldTime[i] = peakHoldTime[i];
++                    newColHeight[i] = colDisplayHeight[i];
++                }
++                
++                peakRow = newPeakRow;
++                peakHoldTime = newPeakHoldTime;
++                colDisplayHeight = newColHeight;
++            }
++        }
++
+         // Start Equalizer Mode
+         function startEqualizerMode(mode) {
+             if (typeof mode !== 'string') mode = activeEqMode;
+@@ -1553,6 +1790,23 @@
+             const config = PLANETS[mode] || PLANETS.earth;
+             eqCols = config.cols;
+             eqRows = config.rows;
++            eqColGap = config.colGap;
++            eqRowGap = config.rowGap;
++
++            // Update sliders UI
++            updatingSlidersFromCode = true;
++            const eqColsSlider = document.getElementById('eq-cols-slider');
++            if (eqColsSlider) {
++                eqColsSlider.value = eqCols;
++                document.getElementById('eq-cols-val').textContent = eqCols;
++                document.getElementById('eq-rows-slider').value = eqRows;
++                document.getElementById('eq-rows-val').textContent = eqRows;
++                document.getElementById('eq-col-gap-slider').value = eqColGap;
++                document.getElementById('eq-col-gap-val').textContent = eqColGap + 'px';
++                document.getElementById('eq-row-gap-slider').value = eqRowGap;
++                document.getElementById('eq-row-gap-val').textContent = eqRowGap + 'px';
++            }
++            updatingSlidersFromCode = false;
+ 
+             // Highlight button
+             document.querySelectorAll('.eq-mode-btn').forEach(btn => {
+@@ -1568,22 +1822,7 @@
+             // Initialize context
+             initAudio();
+ 
+-            let html = '<div class="w-full h-full flex justify-between items-stretch p-4 md:p-6 bg-black relative gap-[2px] md:gap-[4px]" style="background-color: #000000; box-sizing: border-box;">';
+-            for (let c = 0; c < eqCols; c++) {
+-                html += `<div class="flex flex-col-reverse justify-start gap-[2px] md:gap-[3px] flex-1 h-full" id="eq-col-${c}">`;
+-                for (let r = 0; r < eqRows; r++) {
+-                    const rgb = config.getRGB(c, r, eqRows);
+-                    html += `<div class="eq-segment w-full ${config.shape}" style="opacity: 0.15; background-color: rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]}); height: ${100/eqRows}%;" data-col="${c}" data-row="${r}"></div>`;
+-                }
+-                html += '</div>';
+-            }
+-            html += '</div>';
+-            ledPanel.innerHTML = html;
+-
+-            // Reset peak indicators & column display heights
+-            peakRow = Array(eqCols).fill(0);
+-            peakHoldTime = Array(eqCols).fill(0);
+-            colDisplayHeight = Array(eqCols).fill(0);
++            rebuildEqualizerGrid();
+ 
+             // Start draw loop
+             if (equalizerAnimFrame) {
+@@ -1775,10 +2014,60 @@
+         // Wire mic event
+         document.getElementById('btn-mic-toggle').addEventListener('click', toggleMicrophone);
+ 
++        // Wire Equalizer Custom Sliders
++        function onEqSliderChange() {
++            if (updatingSlidersFromCode) return;
++            const colsSlider = document.getElementById('eq-cols-slider');
++            if (!colsSlider) return;
++            
++            const newCols = parseInt(colsSlider.value);
++            document.getElementById('eq-cols-val').textContent = newCols;
++            
++            const newRows = parseInt(document.getElementById('eq-rows-slider').value);
++            document.getElementById('eq-rows-val').textContent = newRows;
++            
++            const newColGap = parseInt(document.getElementById('eq-col-gap-slider').value);
++            document.getElementById('eq-col-gap-val').textContent = newColGap + 'px';
++            
++            const newRowGap = parseInt(document.getElementById('eq-row-gap-slider').value);
++            document.getElementById('eq-row-gap-val').textContent = newRowGap + 'px';
++            
++            const needsRebuild = (newCols !== eqCols || newRows !== eqRows);
++            
++            eqCols = newCols;
++            eqRows = newRows;
++            eqColGap = newColGap;
++            eqRowGap = newRowGap;
++            
++            if (equalizerActive) {
++                if (needsRebuild) {
++                    rebuildEqualizerGrid();
++                } else {
++                    const mainContainer = ledPanel.querySelector('.w-full.h-full.flex');
++                    if (mainContainer) {
++                        mainContainer.style.gap = eqColGap + 'px';
++                        const colContainers = mainContainer.querySelectorAll('.flex-col-reverse');
++                        colContainers.forEach(col => col.style.gap = eqRowGap + 'px');
++                    }
++                }
++            }
++        }
++
++        const eqColsSlider = document.getElementById('eq-cols-slider');
++        if (eqColsSlider) {
++            eqColsSlider.addEventListener('input', onEqSliderChange);
++            document.getElementById('eq-rows-slider').addEventListener('input', onEqSliderChange);
++            document.getElementById('eq-col-gap-slider').addEventListener('input', onEqSliderChange);
++            document.getElementById('eq-row-gap-slider').addEventListener('input', onEqSliderChange);
++        }
++
+         // Setup Audio Player Event Listeners and Playlist management
+         const audioFileInput = document.getElementById('audio-file-input');
+         const audioFolderInput = document.getElementById('audio-folder-input');
++        const playerPrevBtn = document.getElementById('player-prev-btn');
+         const playerPlayBtn = document.getElementById('player-play-btn');
++        const playerStopBtn = document.getElementById('player-stop-btn');
++        const playerNextBtn = document.getElementById('player-next-btn');
+         const playerProgress = document.getElementById('player-progress');
+         const playerVolume = document.getElementById('player-volume');
+         const playerVolumeVal = document.getElementById('player-volume-val');
+@@ -1898,6 +2187,9 @@
+                 playerTrackInfo.textContent = 'No file loaded';
+                 playerTrackInfo.classList.add('hidden');
+                 playerPlayBtn.disabled = true;
++                playerStopBtn.disabled = true;
++                playerPrevBtn.disabled = true;
++                playerNextBtn.disabled = true;
+                 playerProgress.disabled = true;
+                 playerTimeCurrent.textContent = '0:00';
+                 playerTimeTotal.textContent = '0:00';
+@@ -1924,6 +2216,9 @@
+             playerTrackInfo.textContent = track.name;
+             playerTrackInfo.classList.remove('hidden');
+             playerPlayBtn.disabled = false;
++            playerStopBtn.disabled = false;
++            playerPrevBtn.disabled = false;
++            playerNextBtn.disabled = false;
+             playerProgress.disabled = false;
+             
+             initAudio();
+@@ -1957,7 +2252,6 @@
+         });
+ 
+         // Handle folder uploads
+-        const audioFolderInput = document.getElementById('audio-folder-input');
+         if (audioFolderInput) {
+             audioFolderInput.addEventListener('change', function(e) {
+                 const files = e.target.files;
+@@ -1982,7 +2276,6 @@
+         playerPlayBtn.addEventListener('click', function() {
+             initAudio();
+ 
+-
+             if (audioPlayer.paused) {
+                 stopMicrophone();
+                 audioPlayer.play();
+@@ -1994,6 +2287,27 @@
+             }
+         });
+ 
++        playerStopBtn.addEventListener('click', function() {
++            audioPlayer.pause();
++            audioPlayer.currentTime = 0;
++            playerPlayBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">play_arrow</span>';
++            // Also turn off active preset if needed or let equalizer settle
++        });
++
++        playerPrevBtn.addEventListener('click', function() {
++            if (playlist.length === 0) return;
++            let nextIndex = currentPlaylistIndex - 1;
++            if (nextIndex < 0) nextIndex = playlist.length - 1;
++            selectTrack(nextIndex);
++        });
++
++        playerNextBtn.addEventListener('click', function() {
++            if (playlist.length === 0) return;
++            let nextIndex = currentPlaylistIndex + 1;
++            if (nextIndex >= playlist.length) nextIndex = 0;
++            selectTrack(nextIndex);
++        });
++
+         audioPlayer.addEventListener('play', () => {
+             playerPlayBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">pause</span>';
+             renderPlaylist();
+@@ -2045,6 +2359,9 @@
+                 playerTrackInfo.textContent = track.name;
+                 playerTrackInfo.classList.remove('hidden');
+                 playerPlayBtn.disabled = false;
++                playerStopBtn.disabled = false;
++                playerPrevBtn.disabled = false;
++                playerNextBtn.disabled = false;
+                 playerProgress.disabled = false;
+             }
+             renderPlaylist();

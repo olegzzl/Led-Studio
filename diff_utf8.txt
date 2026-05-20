@@ -1,0 +1,506 @@
+diff --git a/index.html b/index.html
+index e7f419d..0003eb0 100644
+--- a/index.html
++++ b/index.html
+@@ -451,7 +451,7 @@
+                     <div class="accordion-inner">
+                         <div class="px-panel-padding py-4 border-t border-outline-variant space-y-4">
+                             <!-- Equalizer Planet Themes -->
+-                            <div class="grid gap-1.5 grid-cols-4 mt-2">
++                            <div class="grid gap-1.5 grid-cols-3 mt-2">
+                                 <button id="btn-eq-earth" onclick="startEqualizerMode('earth')"
+                                     class="eq-mode-btn h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant font-label-sm uppercase text-[9px]">Earth</button>
+                                 <button id="btn-eq-mars" onclick="startEqualizerMode('mars')"
+@@ -468,6 +468,8 @@
+                                     class="eq-mode-btn h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant font-label-sm uppercase text-[9px]">Pluto</button>
+                                 <button id="btn-eq-uranus" onclick="startEqualizerMode('uranus')"
+                                     class="eq-mode-btn h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant font-label-sm uppercase text-[9px]">Uranus</button>
++                                <button id="btn-eq-pluk" onclick="startEqualizerMode('pluk')"
++                                    class="eq-mode-btn h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-on-surface-variant font-label-sm uppercase text-[9px]">Pluk</button>
+                             </div>
+                             <div class="mt-2">
+                                 <button id="btn-mic-toggle"
+@@ -481,8 +483,18 @@
+                             <div
+                                 class="border border-outline-variant p-3 bg-surface-container-low rounded space-y-3 mt-2">
+                                 <div class="font-section-header text-[10px] tracking-wider text-outline uppercase">
+-                                    Custom Grid</div>
++                                    Custom Grid Settings</div>
+ 
++                                <div class="flex flex-col gap-1">
++                                    <div class="flex justify-between items-center px-1">
++                                        <span data-translate="sensitivity-label"
++                                            class="font-label-sm text-on-surface-variant uppercase text-[10px]">Sensitivity</span>
++                                        <span class="font-value-mono text-primary text-[10px]"
++                                            id="eq-sensitivity-val">1.0x</span>
++                                    </div>
++                                    <input class="w-full" id="eq-sensitivity-slider" max="3.0" min="0.2" step="0.1" type="range"
++                                        value="1.0" />
++                                </div>
+                                 <div class="flex flex-col gap-1">
+                                     <div class="flex justify-between items-center px-1">
+                                         <span
+@@ -506,8 +518,7 @@
+                                 <div class="flex flex-col gap-1">
+                                     <div class="flex justify-between items-center px-1">
+                                         <span
+-                                            class="font-label-sm text-on-surface-variant uppercase text-[10px]">Horizontal
+-                                            Gap</span>
++                                            class="font-label-sm text-on-surface-variant uppercase text-[10px]">Horizontal Gap</span>
+                                         <span class="font-value-mono text-primary text-[10px]"
+                                             id="eq-col-gap-val">4px</span>
+                                     </div>
+@@ -517,8 +528,7 @@
+                                 <div class="flex flex-col gap-1">
+                                     <div class="flex justify-between items-center px-1">
+                                         <span
+-                                            class="font-label-sm text-on-surface-variant uppercase text-[10px]">Vertical
+-                                            Gap</span>
++                                            class="font-label-sm text-on-surface-variant uppercase text-[10px]">Vertical Gap</span>
+                                         <span class="font-value-mono text-primary text-[10px]"
+                                             id="eq-row-gap-val">3px</span>
+                                     </div>
+@@ -526,11 +536,30 @@
+                                         value="3" />
+                                 </div>
+                             </div>
++                        </div>
++                    </div>
++                </div>
++            </div>
+ 
++            <!-- Player Section -->
++            <div class="flex flex-col border-b border-outline-variant">
++                <button
++                    class="w-full flex items-center justify-between px-panel-padding py-4 hover:bg-surface-container-high transition-colors group text-left"
++                    onclick="toggleAccordion('player')">
++                    <div class="flex items-center gap-3">
++                        <span class="material-symbols-outlined text-[18px] text-primary">play_circle</span>
++                        <span data-translate="player-header"
++                            class="font-section-header text-section-header uppercase">Player</span>
++                    </div>
++                    <span class="chevron-icon material-symbols-outlined text-on-surface-variant text-[18px] collapsed"
++                        id="chevron-player">expand_more</span>
++                </button>
++                <div class="accordion-content collapsed" id="content-player">
++                    <div class="accordion-inner">
++                        <div class="px-panel-padding py-4 border-t border-outline-variant space-y-3">
+                             <!-- Custom Audio Player Section -->
+                             <div class="border border-outline-variant p-3 bg-surface-container-low rounded space-y-3">
+-                                <div class="font-section-header text-[10px] tracking-wider text-outline uppercase">Audio
+-                                    Player</div>
++                                <div class="font-section-header text-[10px] tracking-wider text-outline uppercase">Audio Player</div>
+ 
+                                 <!-- Playing Song Info -->
+                                 <div id="player-track-info" class="text-[11px] text-primary truncate hidden">
+@@ -776,6 +805,8 @@
+                 "save-video-btn": "Save Video",
+                 "fullscreen-hint": "Double-click for fullscreen. Double-click again to exit.",
+                 "playlist-header": "Playlist",
++                "player-header": "Player",
++                "sensitivity-label": "Sensitivity",
+                 "add-track-item": "Add Tracks",
+                 "add-folder-item": "Add Folder",
+                 "wake-lock-default": "Disable Sleep Mode",
+@@ -818,6 +849,8 @@
+                 "save-video-btn": "Сохранить видео",
+                 "fullscreen-hint": "Дважды кликните для полноэкранного режима. Чтобы выйти, дважды кликните по экрану.",
+                 "playlist-header": "Плейлист",
++                "player-header": "Плеер",
++                "sensitivity-label": "Чувствительность",
+                 "add-track-item": "Треки",
+                 "add-folder-item": "Папку",
+                 "wake-lock-default": "Отключить спящий режим",
+@@ -860,6 +893,8 @@
+                 "save-video-btn": "Зберегти відео",
+                 "fullscreen-hint": "Двічі клікніть для повного екрану. Щоб вийти з повного екрану, двічі клікніть по екрану.",
+                 "playlist-header": "Плейлист",
++                "player-header": "Плеєр",
++                "sensitivity-label": "Чутливість",
+                 "add-track-item": "Треки",
+                 "add-folder-item": "Папку",
+                 "wake-lock-default": "Вимкнути сплячий режим",
+@@ -1017,7 +1052,6 @@
+                     eqBtn.classList.remove('bg-primary', 'text-on-primary', 'border-primary');
+                     eqBtn.classList.add('border-outline-variant', 'text-on-surface-variant');
+                 }
+-                audioPlayer.pause();
+                 stopMicrophone();
+                 ledPanel.classList.remove('vibrating');
+                 ledPanel.style.transform = '';
+@@ -1635,7 +1669,9 @@
+         });
+ 
+         brightSlider.addEventListener('input', () => {
+-            if (!currentPreset && !marqueeActive) {
++            if (marqueeActive) {
++                ledPanel.style.opacity = brightSlider.value / 100;
++            } else if (!currentPreset && !equalizerActive) {
+                 updateLED();
+             }
+         });
+@@ -1838,98 +1874,114 @@
+         let eqRows = 15;
+         let eqColGap = 4;
+         let eqRowGap = 3;
++        let eqSensitivity = 1.0;
+         let updatingSlidersFromCode = false;
+ 
++        function hslToRgb(h, s, l) {
++            h /= 360;
++            s /= 100;
++            l /= 100;
++            let r, g, b;
++            if (s === 0) {
++                r = g = b = l; // achromatic
++            } else {
++                const hue2rgb = (p, q, t) => {
++                    if (t < 0) t += 1;
++                    if (t > 1) t -= 1;
++                    if (t < 1/6) return p + (q - p) * 6 * t;
++                    if (t < 1/2) return q;
++                    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
++                    return p;
++                };
++                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
++                const p = 2 * l - q;
++                r = hue2rgb(p, q, h + 1/3);
++                g = hue2rgb(p, q, h);
++                b = hue2rgb(p, q, h - 1/3);
++            }
++            return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
++        }
++
++        function drawRoundedRect(ctx, x, y, width, height, radius) {
++            if (radius <= 0) {
++                ctx.fillRect(x, y, width, height);
++                return;
++            }
++            ctx.beginPath();
++            ctx.moveTo(x + radius, y);
++            ctx.lineTo(x + width - radius, y);
++            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
++            ctx.lineTo(x + width, y + height - radius);
++            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
++            ctx.lineTo(x + radius, y + height);
++            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
++            ctx.lineTo(x, y + radius);
++            ctx.quadraticCurveTo(x, y, x + radius, y);
++            ctx.closePath();
++            ctx.fill();
++        }
++
+         const PLANETS = {
+-            earth: { cols: 20, rows: 15, colGap: 4, rowGap: 3, shape: 'rounded-[1px]', getRGB: (c, r, tr) => r < tr * 0.6 ? [16, 185, 129] : (r < tr * 0.8 ? [251, 191, 36] : [244, 63, 94]) },
++            earth: {
++                cols: 20,
++                rows: 15,
++                colGap: 4,
++                rowGap: 3,
++                shape: 'rounded-[1px]',
++                getRGB: (c, r, tr) => {
++                    const ratio = r / Math.max(1, tr - 1);
++                    if (ratio < 0.5) {
++                        const t = ratio * 2;
++                        return [
++                            Math.round(16 + t * (251 - 16)),
++                            Math.round(185 + t * (191 - 185)),
++                            Math.round(129 + t * (36 - 129))
++                        ];
++                    } else {
++                        const t = (ratio - 0.5) * 2;
++                        return [
++                            Math.round(251 + t * (244 - 251)),
++                            Math.round(191 + t * (63 - 191)),
++                            Math.round(36 + t * (94 - 36))
++                        ];
++                    }
++                }
++            },
+             mars: { cols: 24, rows: 12, colGap: 3, rowGap: 2, shape: 'rounded-[2px]', getRGB: (c, r, tr) => r < tr * 0.5 ? [239, 68, 68] : (r < tr * 0.8 ? [249, 115, 22] : [234, 179, 8]) },
+             jupiter: { cols: 10, rows: 8, colGap: 6, rowGap: 5, shape: 'rounded-[4px]', getRGB: (c, r, tr) => r < tr * 0.4 ? [202, 138, 4] : (r < tr * 0.7 ? [217, 119, 6] : [248, 113, 113]) },
+             saturn: { cols: 32, rows: 16, colGap: 2, rowGap: 2, shape: 'rounded-full', getRGB: (c, r, tr) => r < tr * 0.6 ? [253, 224, 71] : [254, 240, 138] },
+             venus: { cols: 16, rows: 20, colGap: 4, rowGap: 4, shape: 'rounded-full', getRGB: (c, r, tr) => r < tr * 0.5 ? [236, 72, 153] : [192, 38, 211] },
+             neptune: { cols: 28, rows: 14, colGap: 3, rowGap: 2, shape: 'rounded-[1px]', getRGB: (c, r, tr) => r < tr * 0.7 ? [14, 165, 233] : [6, 182, 212] },
+             pluto: { cols: 12, rows: 12, colGap: 5, rowGap: 5, shape: 'rounded-full', getRGB: (c, r, tr) => [224, 242, 254] },
+-            uranus: { cols: 36, rows: 18, colGap: 2, rowGap: 2, shape: 'rounded-[2px]', getRGB: (c, r, tr) => r < tr * 0.6 ? [20, 184, 166] : [45, 212, 191] }
+-        };
+-
+-        function rebuildEqualizerGrid() {
+-            const config = PLANETS[activeEqMode] || PLANETS.earth;
+-            let contentWrapper = document.getElementById('led-content-wrapper');
+-            let mainContainer = contentWrapper ? contentWrapper.querySelector('.w-full.h-full.flex.bg-black') : null;
+-
+-            // If the main container doesn't exist, build from scratch
+-            if (!mainContainer) {
+-                let html = `<div class="w-full h-full flex justify-between items-stretch p-4 md:p-6 bg-black relative eq-main-container" style="background-color: #000000; box-sizing: border-box; gap: ${eqColGap}px;">`;
+-                for (let c = 0; c < eqCols; c++) {
+-                    html += `<div class="flex flex-col-reverse justify-start flex-1 h-full eq-col-container" id="eq-col-${c}" style="gap: ${eqRowGap}px;">`;
+-                    for (let r = 0; r < eqRows; r++) {
+-                        const rgb = config.getRGB(c, r, eqRows);
+-                        html += `<div class="eq-segment w-full ${config.shape}" style="opacity: 0.15; background-color: rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]}); height: ${100 / eqRows}%;" data-col="${c}" data-row="${r}"></div>`;
+-                    }
+-                    html += '</div>';
++            uranus: { cols: 36, rows: 18, colGap: 2, rowGap: 2, shape: 'rounded-[2px]', getRGB: (c, r, tr) => r < tr * 0.6 ? [20, 184, 166] : [45, 212, 191] },
++            pluk: {
++                cols: 24,
++                rows: 15,
++                colGap: 4,
++                rowGap: 3,
++                shape: 'rounded-[2px]',
++                getRGB: (c, r, tr, tc) => {
++                    const ratio = c / Math.max(1, tc - 1);
++                    const hue = 195 - ratio * 95; // 195 (cyan) -> 100 (lime green)
++                    return hslToRgb(hue, 100, 50);
+                 }
+-                html += '</div>';
+-                setLedHTML(html);
+-
+-                peakRow = Array(eqCols).fill(0);
+-                peakHoldTime = Array(eqCols).fill(0);
+-                colDisplayHeight = Array(eqCols).fill(0);
+-                return;
+-            }
+-
+-            // Incremental DOM update for extremely fast slider interactions
+-            mainContainer.style.gap = eqColGap + 'px';
+-
+-            let currentCols = mainContainer.children.length;
+-
+-            // Adjust Columns
+-            while (currentCols > eqCols) {
+-                mainContainer.removeChild(mainContainer.lastChild);
+-                currentCols--;
+             }
++        };
+ 
+-            while (currentCols < eqCols) {
+-                let colDiv = document.createElement('div');
+-                colDiv.className = `flex flex-col-reverse justify-start flex-1 h-full eq-col-container`;
+-                colDiv.id = `eq-col-${currentCols}`;
+-                colDiv.style.gap = eqRowGap + 'px';
+-                mainContainer.appendChild(colDiv);
+-                currentCols++;
++        function rebuildEqualizerGrid() {
++            let canvas = document.getElementById('eq-canvas');
++            if (!canvas) {
++                setLedHTML(`
++                    <div class="w-full h-full relative bg-black" style="background-color: #000000; overflow: hidden;">
++                        <canvas id="eq-canvas" style="width: 100%; height: 100%; display: block;"></canvas>
++                    </div>
++                `);
++                canvas = document.getElementById('eq-canvas');
+             }
+ 
+-            // Adjust Rows in ALL Columns and update styles
+-            for (let c = 0; c < currentCols; c++) {
+-                let colDiv = mainContainer.children[c];
+-                colDiv.style.gap = eqRowGap + 'px';
+-
+-                let currentRows = colDiv.children.length;
+-
+-                // Add or update rows
+-                for (let r = 0; r < Math.max(currentRows, eqRows); r++) {
+-                    if (r >= eqRows) {
+-                        // Remove excess rows
+-                        colDiv.removeChild(colDiv.lastChild);
+-                    } else if (r >= currentRows) {
+-                        // Add missing rows
+-                        let seg = document.createElement('div');
+-                        seg.className = `eq-segment w-full ${config.shape}`;
+-                        seg.dataset.col = c;
+-                        seg.dataset.row = r;
+-                        const rgb = config.getRGB(c, r, eqRows);
+-                        seg.style.backgroundColor = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+-                        seg.style.opacity = '0.15';
+-                        seg.style.height = `${100 / eqRows}%`;
+-                        colDiv.appendChild(seg);
+-                    } else {
+-                        // Update existing rows
+-                        let seg = colDiv.children[r];
+-                        seg.className = `eq-segment w-full ${config.shape}`;
+-                        seg.dataset.col = c;
+-                        seg.dataset.row = r;
+-                        const rgb = config.getRGB(c, r, eqRows);
+-                        seg.style.backgroundColor = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+-                        seg.style.height = `${100 / eqRows}%`;
+-                    }
+-                }
++            if (canvas) {
++                canvas.width = canvas.clientWidth || 768;
++                canvas.height = canvas.clientHeight || 432;
+             }
+ 
+             // Adjust peak arrays safely
+@@ -2033,7 +2085,44 @@
+                 let activeCount = 0;
+                 let activeR = 0, activeG = 0, activeB = 0;
+                 let totalVolume = 0;
+-                const config = PLANETS[activeEqMode];
++                const config = PLANETS[activeEqMode] || PLANETS.earth;
++
++                const canvas = document.getElementById('eq-canvas');
++                if (!canvas) return;
++                const ctx = canvas.getContext('2d');
++
++                // Resize canvas if container size changed
++                if (canvas.width !== canvas.clientWidth || canvas.height !== canvas.clientHeight) {
++                    canvas.width = canvas.clientWidth || 768;
++                    canvas.height = canvas.clientHeight || 432;
++                }
++
++                // Clear canvas
++                ctx.fillStyle = '#000000';
++                ctx.fillRect(0, 0, canvas.width, canvas.height);
++
++                const p = 16;
++                const w = canvas.width;
++                const h = canvas.height;
++                const availableW = w - 2 * p;
++                const availableH = h - 2 * p;
++
++                const colW = (availableW - (eqCols - 1) * eqColGap) / eqCols;
++                const rowH = (availableH - (eqRows - 1) * eqRowGap) / eqRows;
++
++                const cellW = Math.max(1, colW);
++                const cellH = Math.max(1, rowH);
++
++                let radius = 1;
++                if (config.shape.includes('full')) {
++                    radius = Math.min(cellW, cellH) / 2;
++                } else if (config.shape.includes('[4px]')) {
++                    radius = 4;
++                } else if (config.shape.includes('[2px]')) {
++                    radius = 2;
++                } else if (config.shape.includes('[1px]')) {
++                    radius = 1;
++                }
+ 
+                 for (let c = 0; c < eqCols; c++) {
+                     const bin = binMapping[c];
+@@ -2053,7 +2142,7 @@
+                         val = sum / (count || 1);
+                     }
+ 
+-                    val = val * 0.65;
++                    val = val * 0.65 * eqSensitivity;
+                     let boost = 1.0;
+                     if (c > Math.floor(eqCols * 0.25)) {
+                         boost = 1.0 + (c - Math.floor(eqCols * 0.25)) * 0.15;
+@@ -2084,33 +2173,41 @@
+                         }
+                     }
+ 
++                    const x = p + c * (colW + eqColGap);
++
+                     for (let r = 0; r < eqRows; r++) {
+-                        const segment = ledPanel.querySelector(`.eq-segment[data-col="${c}"][data-row="${r}"]`);
+-                        if (segment) {
+-                            const isPeak = (r === Math.floor(peakRow[c]) - 1 && r > 0);
+-                            if (r < litCount || isPeak) {
+-                                const rgb = config.getRGB(c, r, eqRows);
+-                                segment.style.opacity = baseOpacity;
+-                                segment.style.boxShadow = `0 0 10px rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.85)`;
+-
+-                                const isVibratingSegment = (isPeak || (r === litCount - 1 && litCount > 0));
+-                                if (isVibratingSegment && litCount >= (eqRows * 0.6)) {
+-                                    segment.classList.add('eq-column-vibrating');
+-                                } else {
+-                                    segment.classList.remove('eq-column-vibrating');
+-                                }
+-
+-                                activeR += rgb[0]; activeG += rgb[1]; activeB += rgb[2];
+-                                activeCount++;
+-                            } else {
+-                                segment.classList.remove('eq-column-vibrating');
+-                                segment.style.opacity = '0.15';
+-                                segment.style.boxShadow = 'none';
+-                            }
++                        const isPeak = (r === Math.floor(peakRow[c]) - 1 && r > 0);
++                        const rgb = config.getRGB(c, r, eqRows, eqCols);
++                        
++                        let yOffset = 0;
++                        const isVibratingSegment = (isPeak || (r === litCount - 1 && litCount > 0));
++                        if (isVibratingSegment && litCount >= (eqRows * 0.6)) {
++                            yOffset = (Math.random() - 0.5) * 3;
++                        }
++
++                        const y = h - p - cellH - r * (rowH + eqRowGap) + yOffset;
++
++                        if (r < litCount || isPeak) {
++                            ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${baseOpacity})`;
++                            ctx.shadowColor = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.85)`;
++                            ctx.shadowBlur = 8;
++                            drawRoundedRect(ctx, x, y, cellW, cellH, radius);
++
++                            activeR += rgb[0]; activeG += rgb[1]; activeB += rgb[2];
++                            activeCount++;
++                        } else {
++                            ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.15)`;
++                            ctx.shadowColor = 'transparent';
++                            ctx.shadowBlur = 0;
++                            drawRoundedRect(ctx, x, y, cellW, cellH, radius);
+                         }
+                     }
+                 }
+ 
++                // Reset shadow properties
++                ctx.shadowColor = 'transparent';
++                ctx.shadowBlur = 0;
++
+                 const avgVolume = totalVolume / eqCols;
+                 const glowSize = 40 + (avgVolume / 255) * 140;
+ 
+@@ -2121,7 +2218,7 @@
+                     ledPanel.style.setProperty('--glow-color', `rgba(${glowR}, ${glowG}, ${glowB}, ${baseOpacity * 0.5})`);
+                     ledPanel.style.boxShadow = `0 0 ${glowSize}px rgba(${glowR}, ${glowG}, ${glowB}, ${baseOpacity * 0.6})`;
+                 } else {
+-                    const bgRGB = PLANETS[activeEqMode].getRGB(0, 0, eqRows);
++                    const bgRGB = config.getRGB(0, 0, eqRows, eqCols);
+                     ledPanel.style.setProperty('--glow-color', `rgba(${bgRGB[0]}, ${bgRGB[1]}, ${bgRGB[2]}, ${baseOpacity * 0.1})`);
+                     ledPanel.style.boxShadow = `0 0 40px rgba(${bgRGB[0]}, ${bgRGB[1]}, ${bgRGB[2]}, ${baseOpacity * 0.15})`;
+                 }
+@@ -2204,24 +2301,13 @@
+             const newRowGap = parseInt(document.getElementById('eq-row-gap-slider').value);
+             document.getElementById('eq-row-gap-val').textContent = newRowGap + 'px';
+ 
+-            const needsRebuild = (newCols !== eqCols || newRows !== eqRows);
+-
+             eqCols = newCols;
+             eqRows = newRows;
+             eqColGap = newColGap;
+             eqRowGap = newRowGap;
+ 
+             if (equalizerActive) {
+-                if (needsRebuild) {
+-                    rebuildEqualizerGrid();
+-                } else {
+-                    const mainContainer = ledPanel.querySelector('.w-full.h-full.flex');
+-                    if (mainContainer) {
+-                        mainContainer.style.gap = eqColGap + 'px';
+-                        const colContainers = mainContainer.querySelectorAll('.flex-col-reverse');
+-                        colContainers.forEach(col => col.style.gap = eqRowGap + 'px');
+-                    }
+-                }
++                rebuildEqualizerGrid();
+             }
+         }
+ 
+@@ -2233,6 +2319,17 @@
+             document.getElementById('eq-row-gap-slider').addEventListener('input', onEqSliderChange);
+         }
+ 
++        const eqSensitivitySlider = document.getElementById('eq-sensitivity-slider');
++        if (eqSensitivitySlider) {
++            const updateSensitivity = function () {
++                eqSensitivity = parseFloat(this.value);
++                const valEl = document.getElementById('eq-sensitivity-val');
++                if (valEl) valEl.textContent = eqSensitivity.toFixed(1) + 'x';
++            };
++            eqSensitivitySlider.addEventListener('input', updateSensitivity);
++            eqSensitivitySlider.addEventListener('change', updateSensitivity);
++        }
++
+         // Setup Audio Player Event Listeners and Playlist management
+         const audioFileInput = document.getElementById('audio-file-input');
+         const audioFolderInput = document.getElementById('audio-folder-input');
