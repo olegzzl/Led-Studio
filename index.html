@@ -2059,6 +2059,8 @@
         let eqPresets = [];
         let selectedHorizCircleIndex = 0;
         let customEqHorizHues = [200, 100, 300];
+        let _glowCanvas = null;
+        let _glowCtx = null;
 
         function hslToRgb(h, s, l) {
             h /= 360;
@@ -2554,6 +2556,21 @@
                 ctx.fillStyle = '#000000';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+                // Initialize offscreen glow canvas (half-res for natural blur + performance)
+                if (!_glowCanvas) {
+                    _glowCanvas = document.createElement('canvas');
+                    _glowCtx = _glowCanvas.getContext('2d');
+                }
+                const glowScale = 0.5;
+                const gw = Math.ceil(canvas.width * glowScale);
+                const gh = Math.ceil(canvas.height * glowScale);
+                if (_glowCanvas.width !== gw || _glowCanvas.height !== gh) {
+                    _glowCanvas.width = gw;
+                    _glowCanvas.height = gh;
+                } else {
+                    _glowCtx.clearRect(0, 0, gw, gh);
+                }
+
                 const p = 16;
                 const w = canvas.width;
                 const h = canvas.height;
@@ -2645,24 +2662,32 @@
 
                         if (r < litCount || isPeak) {
                             ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${baseOpacity})`;
-                            ctx.shadowColor = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.85)`;
-                            ctx.shadowBlur = 8;
                             drawRoundedRect(ctx, x, y, cellW, cellH, radius);
+
+                            // Draw to half-res glow canvas (composited with blur later)
+                            _glowCtx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.7)`;
+                            _glowCtx.fillRect(
+                                x * glowScale, y * glowScale,
+                                Math.ceil(cellW * glowScale) + 1, Math.ceil(cellH * glowScale) + 1
+                            );
 
                             activeR += rgb[0]; activeG += rgb[1]; activeB += rgb[2];
                             activeCount++;
                         } else {
                             ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.15)`;
-                            ctx.shadowColor = 'transparent';
-                            ctx.shadowBlur = 0;
                             drawRoundedRect(ctx, x, y, cellW, cellH, radius);
                         }
                     }
                 }
 
-                // Reset shadow properties
-                ctx.shadowColor = 'transparent';
-                ctx.shadowBlur = 0;
+                // Composite glow: ONE blur pass replaces 600+ per-segment shadowBlur ops
+                ctx.save();
+                ctx.globalCompositeOperation = 'lighter';
+                ctx.globalAlpha = 0.45;
+                ctx.filter = 'blur(6px)';
+                ctx.imageSmoothingEnabled = true;
+                ctx.drawImage(_glowCanvas, 0, 0, canvas.width, canvas.height);
+                ctx.restore();
 
                 const avgVolume = totalVolume / eqCols;
                 const glowSize = 40 + (avgVolume / 255) * 140;
