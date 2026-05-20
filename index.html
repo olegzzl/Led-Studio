@@ -502,8 +502,34 @@
                                         <button type="button" id="btn-eq-add-color" onclick="addCustomEqColor()" class="w-6 h-6 border border-outline-variant hover:bg-surface-container-high transition-colors text-primary rounded flex items-center justify-center font-bold text-[14px]">+</button>
                                     </div>
                                 </div>
-                                <div id="eq-custom-sliders-list" class="space-y-3">
-                                    <!-- Sliders will be dynamically added here -->
+                                
+                                <!-- Mode Selector Tabs -->
+                                <div class="flex border border-outline-variant/50 rounded overflow-hidden text-[9px] font-bold uppercase">
+                                    <button type="button" id="btn-eq-submode-vertical" onclick="setCustomEqSubMode('vertical')" data-translate="eq-submode-vertical" class="flex-1 py-1.5 transition-colors border-r border-outline-variant/30 bg-primary text-on-primary">Lines</button>
+                                    <button type="button" id="btn-eq-submode-horizontal" onclick="setCustomEqSubMode('horizontal')" data-translate="eq-submode-horizontal" class="flex-1 py-1.5 transition-colors text-on-surface-variant hover:bg-surface-container-high">Columns</button>
+                                </div>
+
+                                <!-- Vertical Mode Panel (Horizontal lines of color) -->
+                                <div id="eq-panel-submode-vertical" class="space-y-3">
+                                    <div id="eq-custom-sliders-list" class="space-y-3">
+                                        <!-- Sliders will be dynamically added here -->
+                                    </div>
+                                </div>
+
+                                <!-- Horizontal Mode Panel (Vertical columns of color) -->
+                                <div id="eq-panel-submode-horizontal" class="hidden space-y-3">
+                                    <div class="flex justify-between items-center py-1">
+                                        <span class="text-[9px] text-on-surface-variant uppercase font-mono tracking-wider">Zones (L / C / R):</span>
+                                        <div class="flex gap-3">
+                                            <button type="button" id="eq-horiz-circle-0" onclick="selectHorizCircle(0)" class="w-6 h-6 rounded-full border border-outline shadow-sm transition-transform hover:scale-110 active:scale-95 ring-2 ring-primary" style="background: hsl(200, 100%, 50%);"></button>
+                                            <button type="button" id="eq-horiz-circle-1" onclick="selectHorizCircle(1)" class="w-6 h-6 rounded-full border border-outline shadow-sm transition-transform hover:scale-110 active:scale-95" style="background: hsl(100, 100%, 50%);"></button>
+                                            <button type="button" id="eq-horiz-circle-2" onclick="selectHorizCircle(2)" class="w-6 h-6 rounded-full border border-outline shadow-sm transition-transform hover:scale-110 active:scale-95" style="background: hsl(300, 100%, 50%);"></button>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2 mt-1.5">
+                                        <div id="eq-horiz-hue-dot" class="w-4 h-4 rounded-full border border-outline-variant flex-shrink-0" style="background-color: hsl(200, 100%, 50%);"></div>
+                                        <input type="range" id="eq-horiz-hue-slider" min="0" max="360" value="200" class="w-full flex-1" style="touch-action: manipulation;" oninput="onHorizHueSliderInput(this.value)" />
+                                    </div>
                                 </div>
                             </div>
                             <div class="mt-2">
@@ -528,6 +554,16 @@
                                             id="eq-sensitivity-val">1.0x</span>
                                     </div>
                                     <input class="w-full" id="eq-sensitivity-slider" max="3.0" min="0.2" step="0.1" type="range"
+                                        value="1.0" />
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex justify-between items-center px-1">
+                                        <span data-translate="amplitude-label"
+                                            class="font-label-sm text-on-surface-variant uppercase text-[10px]">Amplitude</span>
+                                        <span class="font-value-mono text-primary text-[10px]"
+                                            id="eq-amplitude-val">1.0x</span>
+                                    </div>
+                                    <input class="w-full" id="eq-amplitude-slider" max="3.0" min="0.5" step="0.1" type="range"
                                         value="1.0" />
                                 </div>
                                 <div class="flex flex-col gap-1">
@@ -599,6 +635,20 @@
                                     </div>
                                     <input class="w-full" id="eq-row-gap-slider" max="24" min="0" step="1" type="range"
                                         value="3" />
+                                </div>
+                            </div>
+
+                            <!-- Custom Presets Manager -->
+                            <div class="border border-outline-variant p-3 bg-surface-container-low rounded space-y-3 mt-2">
+                                <div class="font-section-header text-[10px] tracking-wider text-outline uppercase flex justify-between items-center font-bold">
+                                    <span data-translate="eq-presets-header">Equalizer Presets</span>
+                                </div>
+                                <div class="flex gap-1.5 items-center">
+                                    <input type="text" id="eq-preset-name" placeholder="Preset name..." class="bg-surface-container-low text-primary border border-outline-variant font-body-sm px-2 py-1.5 focus:border-primary outline-none flex-1 text-[11px]" />
+                                    <button type="button" onclick="saveEqPreset()" class="w-8 h-8 border border-outline-variant hover:bg-surface-container-high transition-colors text-primary rounded flex items-center justify-center font-bold text-[18px]" title="Add Preset">+</button>
+                                </div>
+                                <div id="eq-presets-list" class="space-y-1.5 text-[11px] max-h-[120px] overflow-y-auto pr-1">
+                                    <!-- Saved presets will be rendered here -->
                                 </div>
                             </div>
                         </div>
@@ -875,9 +925,13 @@
                 "eq-gradient-btn": "Gradient",
                 "player-header": "Player",
                 "sensitivity-label": "Sensitivity",
+                "amplitude-label": "Amplitude",
                 "bass-label": "Bass",
                 "mids-label": "Mids",
                 "treble-label": "Treble",
+                "eq-presets-header": "Equalizer Presets",
+                "eq-submode-vertical": "Lines",
+                "eq-submode-horizontal": "Columns",
                 "add-track-item": "Add Tracks",
                 "add-folder-item": "Add Folder",
                 "wake-lock-default": "Disable Sleep Mode",
@@ -925,9 +979,13 @@
                 "eq-gradient-btn": "Градиент",
                 "player-header": "Плеер",
                 "sensitivity-label": "Чувствительность",
+                "amplitude-label": "Амплитуда",
                 "bass-label": "Басы",
                 "mids-label": "Средние",
                 "treble-label": "Высокие",
+                "eq-presets-header": "Пресеты эквалайзера",
+                "eq-submode-vertical": "Линии",
+                "eq-submode-horizontal": "Колонки",
                 "add-track-item": "Треки",
                 "add-folder-item": "Папку",
                 "wake-lock-default": "Отключить спящий режим",
@@ -975,9 +1033,13 @@
                 "eq-gradient-btn": "Градієнт",
                 "player-header": "Плеєр",
                 "sensitivity-label": "Чутливість",
+                "amplitude-label": "Амплітуда",
                 "bass-label": "Баси",
                 "mids-label": "Середні",
                 "treble-label": "Високі",
+                "eq-presets-header": "Пресети еквалайзера",
+                "eq-submode-vertical": "Лінії",
+                "eq-submode-horizontal": "Колонки",
                 "add-track-item": "Треки",
                 "add-folder-item": "Папку",
                 "wake-lock-default": "Вимкнути сплячий режим",
@@ -1032,6 +1094,13 @@
             document.querySelectorAll('.marquee-input-line').forEach(input => {
                 input.placeholder = placeholderVal;
             });
+
+            const eqPresetInput = document.getElementById('eq-preset-name');
+            if (eqPresetInput) {
+                if (lang === 'ru') eqPresetInput.placeholder = 'Имя пресета...';
+                else if (lang === 'ua') eqPresetInput.placeholder = 'Ім\'я пресета...';
+                else eqPresetInput.placeholder = 'Preset name...';
+            }
         }
 
         // Наблюдатель изменения размеров для динамического масштабирования в полноэкранном режиме
@@ -1977,6 +2046,7 @@
         let eqColGap = 4;
         let eqRowGap = 3;
         let eqSensitivity = 1.0;
+        let eqAmplitude = 1.0;
         let eqSensBass = 1.0;
         let eqSensMids = 1.0;
         let eqSensTreble = 1.0;
@@ -1984,6 +2054,10 @@
         let customEqHues = [200];
         let customEqBounds = [];
         let customEqGradientActive = false;
+        let customEqDirection = 'vertical';
+        let eqPresets = [];
+        let selectedHorizCircleIndex = 0;
+        let customEqHorizHues = [200, 100, 300];
 
         function hslToRgb(h, s, l) {
             h /= 360;
@@ -2081,6 +2155,33 @@
                 rowGap: 3,
                 shape: 'rounded-[2px]',
                 getRGB: (c, r, tr, tc) => {
+                    if (customEqDirection === 'horizontal') {
+                        const p = c / Math.max(1, tc - 1);
+                        let hue;
+                        if (customEqGradientActive) {
+                            const interpolateHue = (h1, h2, frac) => {
+                                if (h2 - h1 > 180) h1 += 360;
+                                else if (h1 - h2 > 180) h2 += 360;
+                                let h = (h1 * (1 - frac) + h2 * frac) % 360;
+                                if (h < 0) h += 360;
+                                return h;
+                            };
+                            if (p <= 0.5) {
+                                hue = interpolateHue(customEqHorizHues[0], customEqHorizHues[1], p * 2);
+                            } else {
+                                hue = interpolateHue(customEqHorizHues[1], customEqHorizHues[2], (p - 0.5) * 2);
+                            }
+                        } else {
+                            if (p < 0.33) {
+                                hue = customEqHorizHues[0];
+                            } else if (p < 0.66) {
+                                hue = customEqHorizHues[1];
+                            } else {
+                                hue = customEqHorizHues[2];
+                            }
+                        }
+                        return hslToRgb(hue, 100, 50);
+                    }
                     if (customEqHues.length === 0) return [255, 255, 255];
                     const N = customEqHues.length;
                     const p = r / Math.max(1, tr - 1);
@@ -2235,7 +2336,7 @@
             // Toggle vertical sliders container next to canvas
             const vertSlidersContainer = document.getElementById('eq-custom-vertical-sliders-container');
             if (vertSlidersContainer) {
-                if (mode === 'custom') {
+                if (mode === 'custom' && customEqDirection !== 'horizontal') {
                     vertSlidersContainer.classList.remove('hidden');
                     renderVerticalSliders();
                 } else {
@@ -2537,21 +2638,11 @@
                     val = Math.min(255, val);
                     totalVolume += val;
 
-                    const targetLitCount = Math.round((val / 255) * eqRows);
+                    const targetLitCount = Math.min(eqRows, Math.round((val / 255) * eqRows * eqAmplitude));
 
-                    // Dynamic attack/release based on frequency band
-                    // Bass needs fast release to bounce cleanly, treble can hover slightly longer
-                    const attack = 0.50;
-                    const release = (c < bassRange) ? 0.22 : 0.18;
-
-                    const diff = targetLitCount - colDisplayHeight[c];
-                    if (diff > 0) {
-                        colDisplayHeight[c] += diff * attack;
-                    } else {
-                        colDisplayHeight[c] += diff * release;
-                    }
-
-                    const litCount = Math.round(colDisplayHeight[c]);
+                    // Dynamics: Instant responsiveness matching the original canvas visualizer
+                    colDisplayHeight[c] = targetLitCount;
+                    const litCount = targetLitCount;
 
                     if (litCount >= peakRow[c]) {
                         peakRow[c] = litCount;
@@ -2720,6 +2811,17 @@
             };
             eqSensitivitySlider.addEventListener('input', updateSensitivity);
             eqSensitivitySlider.addEventListener('change', updateSensitivity);
+        }
+
+        const eqAmplitudeSlider = document.getElementById('eq-amplitude-slider');
+        if (eqAmplitudeSlider) {
+            const updateAmplitude = function () {
+                eqAmplitude = parseFloat(this.value);
+                const valEl = document.getElementById('eq-amplitude-val');
+                if (valEl) valEl.textContent = eqAmplitude.toFixed(1) + 'x';
+            };
+            eqAmplitudeSlider.addEventListener('input', updateAmplitude);
+            eqAmplitudeSlider.addEventListener('change', updateAmplitude);
         }
 
         const eqSensBassSlider = document.getElementById('eq-sens-bass-slider');
@@ -2966,6 +3068,217 @@
             });
         }
 
+        // Equalizer Presets Logic
+        function initEqPresets() {
+            try {
+                eqPresets = JSON.parse(localStorage.getItem('eq-presets') || '[]');
+            } catch (e) {
+                eqPresets = [];
+            }
+            renderEqPresetsList();
+            setCustomEqSubMode(customEqDirection);
+            selectHorizCircle(selectedHorizCircleIndex);
+        }
+
+        function saveEqPreset() {
+            const nameInput = document.getElementById('eq-preset-name');
+            const name = nameInput.value.trim();
+            if (!name) {
+                alert(currentLang === 'ru' ? 'Введите имя пресета' : (currentLang === 'ua' ? 'Введіть ім\'я пресета' : 'Enter preset name'));
+                return;
+            }
+            
+            const preset = {
+                name: name,
+                cols: eqCols,
+                rows: eqRows,
+                colGap: eqColGap,
+                rowGap: eqRowGap,
+                sensitivity: eqSensitivity,
+                amplitude: eqAmplitude,
+                sensBass: eqSensBass,
+                sensMids: eqSensMids,
+                sensTreble: eqSensTreble,
+                customEqHues: [...customEqHues],
+                customEqBounds: [...customEqBounds],
+                customEqGradientActive: customEqGradientActive,
+                customEqDirection: customEqDirection,
+                customEqHorizHues: [...customEqHorizHues],
+                selectedHorizCircleIndex: selectedHorizCircleIndex
+            };
+            
+            eqPresets = eqPresets.filter(p => p.name.toLowerCase() !== name.toLowerCase());
+            eqPresets.push(preset);
+            localStorage.setItem('eq-presets', JSON.stringify(eqPresets));
+            
+            nameInput.value = '';
+            renderEqPresetsList();
+        }
+
+        function deleteEqPreset(name) {
+            eqPresets = eqPresets.filter(p => p.name !== name);
+            localStorage.setItem('eq-presets', JSON.stringify(eqPresets));
+            renderEqPresetsList();
+        }
+
+        function loadEqPreset(name) {
+            const preset = eqPresets.find(p => p.name === name);
+            if (!preset) return;
+            
+            eqCols = preset.cols || 20;
+            eqRows = preset.rows || 15;
+            eqColGap = preset.colGap || 4;
+            eqRowGap = preset.rowGap || 3;
+            eqSensitivity = preset.sensitivity !== undefined ? preset.sensitivity : 1.0;
+            eqAmplitude = preset.amplitude !== undefined ? preset.amplitude : 1.0;
+            eqSensBass = preset.sensBass !== undefined ? preset.sensBass : 1.0;
+            eqSensMids = preset.sensMids !== undefined ? preset.sensMids : 1.0;
+            eqSensTreble = preset.sensTreble !== undefined ? preset.sensTreble : 1.0;
+            customEqHues = preset.customEqHues ? [...preset.customEqHues] : [200];
+            customEqBounds = preset.customEqBounds ? [...preset.customEqBounds] : [];
+            customEqGradientActive = preset.customEqGradientActive || false;
+            customEqDirection = preset.customEqDirection || 'vertical';
+            customEqHorizHues = preset.customEqHorizHues ? [...preset.customEqHorizHues] : [200, 100, 300];
+            selectedHorizCircleIndex = preset.selectedHorizCircleIndex !== undefined ? preset.selectedHorizCircleIndex : 0;
+            
+            // Update inputs UI
+            updatingSlidersFromCode = true;
+            const eqColsSlider = document.getElementById('eq-cols-slider');
+            if (eqColsSlider) {
+                eqColsSlider.value = eqCols;
+                document.getElementById('eq-cols-val').textContent = eqCols;
+                document.getElementById('eq-rows-slider').value = eqRows;
+                document.getElementById('eq-rows-val').textContent = eqRows;
+                document.getElementById('eq-col-gap-slider').value = eqColGap;
+                document.getElementById('eq-col-gap-val').textContent = eqColGap + 'px';
+                document.getElementById('eq-row-gap-slider').value = eqRowGap;
+                document.getElementById('eq-row-gap-val').textContent = eqRowGap + 'px';
+                document.getElementById('eq-sensitivity-slider').value = eqSensitivity;
+                document.getElementById('eq-sensitivity-val').textContent = eqSensitivity.toFixed(1) + 'x';
+                document.getElementById('eq-amplitude-slider').value = eqAmplitude;
+                document.getElementById('eq-amplitude-val').textContent = eqAmplitude.toFixed(1) + 'x';
+                document.getElementById('eq-sens-bass-slider').value = eqSensBass;
+                document.getElementById('eq-sens-bass-val').textContent = eqSensBass.toFixed(1) + 'x';
+                document.getElementById('eq-sens-mids-slider').value = eqSensMids;
+                document.getElementById('eq-sens-mids-val').textContent = eqSensMids.toFixed(1) + 'x';
+                document.getElementById('eq-sens-treble-slider').value = eqSensTreble;
+                document.getElementById('eq-sens-treble-val').textContent = eqSensTreble.toFixed(1) + 'x';
+            }
+            updatingSlidersFromCode = false;
+            
+            // Re-render sliders and settings
+            renderCustomEqSliders();
+            updateGradientButtonState();
+            
+            // Set submode UI
+            setCustomEqSubMode(customEqDirection);
+            selectHorizCircle(selectedHorizCircleIndex);
+            
+            // Force mode to 'custom' to display correctly
+            startEqualizerMode('custom');
+        }
+
+        function renderEqPresetsList() {
+            const list = document.getElementById('eq-presets-list');
+            if (!list) return;
+            list.innerHTML = '';
+            
+            if (eqPresets.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'text-outline-variant italic text-center py-2 text-[10px]';
+                empty.textContent = currentLang === 'ru' ? 'Нет сохраненных пресетов' : (currentLang === 'ua' ? 'Немає збережених пресетів' : 'No saved presets');
+                list.appendChild(empty);
+                return;
+            }
+            
+            eqPresets.forEach(preset => {
+                const row = document.createElement('div');
+                row.className = 'flex items-center justify-between py-1 px-1.5 rounded hover:bg-surface-container-high transition-colors cursor-pointer text-on-surface-variant gap-2';
+                
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'truncate flex-1 font-bold';
+                nameSpan.textContent = preset.name;
+                nameSpan.addEventListener('click', () => loadEqPreset(preset.name));
+                
+                const delBtn = document.createElement('span');
+                delBtn.className = 'material-symbols-outlined text-[13px] text-outline-variant hover:text-red-500 transition-colors cursor-pointer shrink-0';
+                delBtn.textContent = 'delete';
+                delBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteEqPreset(preset.name);
+                });
+                
+                row.appendChild(nameSpan);
+                row.appendChild(delBtn);
+                list.appendChild(row);
+            });
+        }
+
+        // Submode horizontal/vertical switches and handlers
+        function setCustomEqSubMode(mode) {
+            customEqDirection = mode;
+            
+            const btnVert = document.getElementById('btn-eq-submode-vertical');
+            const btnHoriz = document.getElementById('btn-eq-submode-horizontal');
+            const panelVert = document.getElementById('eq-panel-submode-vertical');
+            const panelHoriz = document.getElementById('eq-panel-submode-horizontal');
+            const addColorBtn = document.getElementById('btn-eq-add-color');
+            const vertSlidersContainer = document.getElementById('eq-custom-vertical-sliders-container');
+
+            if (mode === 'vertical') {
+                if (btnVert) btnVert.className = 'flex-1 py-1.5 bg-primary text-on-primary border-r border-outline-variant/30 transition-colors';
+                if (btnHoriz) btnHoriz.className = 'flex-1 py-1.5 text-on-surface-variant hover:bg-surface-container-high transition-colors';
+                if (panelVert) panelVert.classList.remove('hidden');
+                if (panelHoriz) panelHoriz.classList.add('hidden');
+                if (addColorBtn) addColorBtn.classList.remove('hidden');
+                if (vertSlidersContainer && activeEqMode === 'custom') vertSlidersContainer.classList.remove('hidden');
+            } else {
+                if (btnVert) btnVert.className = 'flex-1 py-1.5 text-on-surface-variant hover:bg-surface-container-high border-r border-outline-variant/30 transition-colors';
+                if (btnHoriz) btnHoriz.className = 'flex-1 py-1.5 bg-primary text-on-primary transition-colors';
+                if (panelVert) panelVert.classList.add('hidden');
+                if (panelHoriz) panelHoriz.classList.remove('hidden');
+                if (addColorBtn) addColorBtn.classList.add('hidden');
+                if (vertSlidersContainer) vertSlidersContainer.classList.add('hidden');
+            }
+        }
+
+        function selectHorizCircle(index) {
+            selectedHorizCircleIndex = index;
+            
+            // Highlight active circle
+            for (let i = 0; i < 3; i++) {
+                const circle = document.getElementById(`eq-horiz-circle-${i}`);
+                if (circle) {
+                    if (i === index) {
+                        circle.classList.add('ring-2', 'ring-primary');
+                    } else {
+                        circle.classList.remove('ring-2', 'ring-primary');
+                    }
+                }
+            }
+            
+            // Set slider value
+            const hue = customEqHorizHues[index];
+            const slider = document.getElementById('eq-horiz-hue-slider');
+            if (slider) slider.value = hue;
+            
+            const dot = document.getElementById('eq-horiz-hue-dot');
+            if (dot) dot.style.backgroundColor = `hsl(${hue}, 100%, 50%)`;
+        }
+
+        function onHorizHueSliderInput(value) {
+            const hue = parseInt(value);
+            customEqHorizHues[selectedHorizCircleIndex] = hue;
+            
+            // Update circle background
+            const circle = document.getElementById(`eq-horiz-circle-${selectedHorizCircleIndex}`);
+            if (circle) circle.style.backgroundColor = `hsl(${hue}, 100%, 50%)`;
+            
+            // Update slider dot background
+            const dot = document.getElementById('eq-horiz-hue-dot');
+            if (dot) dot.style.backgroundColor = `hsl(${hue}, 100%, 50%)`;
+        }
+
         playerPlayBtn.addEventListener('click', function () {
             initAudio();
 
@@ -3070,6 +3383,7 @@
         // Initial draw & load
         updateLED();
         initPlaylist();
+        initEqPresets();
 
         // Initialize translations to saved or default language
         changeLanguage(currentLang);
