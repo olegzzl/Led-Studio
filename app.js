@@ -676,6 +676,40 @@ document.addEventListener('mouseup', () => { setTimeout(() => { isDraggingInside
 document.addEventListener('touchend', () => { setTimeout(() => { isDraggingInsideAside = false; }, 0); });
 
 function toggleFullscreen() {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+    if (isIOS) {
+        const isIosFullscreen = ledPanel.classList.contains('ios-fullscreen-fallback');
+        if (!isIosFullscreen) {
+            ledPanel.classList.add('ios-fullscreen-fallback');
+            if (asideElement) {
+                asideParent = asideElement.parentNode;
+                asideNextSibling = asideElement.nextSibling;
+                asideElement.style.position = 'absolute';
+                asideElement.style.right = '0';
+                asideElement.style.top = '0';
+                asideElement.style.height = '100%';
+                asideElement.style.zIndex = '1000';
+                asideElement.style.display = 'none'; // Hidden initially
+                ledPanel.appendChild(asideElement);
+            }
+        } else {
+            ledPanel.classList.remove('ios-fullscreen-fallback');
+            if (asideParent && asideElement) {
+                asideElement.style.position = '';
+                asideElement.style.right = '';
+                asideElement.style.top = '';
+                asideElement.style.height = '';
+                asideElement.style.zIndex = '';
+                asideElement.style.display = '';
+                asideParent.insertBefore(asideElement, asideNextSibling);
+                asideParent = null;
+                asideNextSibling = null;
+            }
+        }
+        return;
+    }
+
     if (!document.fullscreenElement) {
         ledPanel.requestFullscreen().then(() => {
             if (asideElement) {
@@ -732,7 +766,7 @@ document.addEventListener('fullscreenchange', () => {
 
 // Auto-hide control panel if window becomes too narrow (mobile portrait)
 window.addEventListener('resize', () => {
-    if (document.fullscreenElement && asideElement && window.innerWidth < 768) {
+    if ((document.fullscreenElement || ledPanel.classList.contains('ios-fullscreen-fallback')) && asideElement && window.innerWidth < 768) {
         if (asideElement.style.display === 'flex') {
             asideElement.style.display = 'none';
         }
@@ -741,7 +775,7 @@ window.addEventListener('resize', () => {
 
 // Single tap/click on screen reveals control panel in fullscreen
 ledPanel.addEventListener('click', (e) => {
-    if (document.fullscreenElement && asideElement) {
+    if ((document.fullscreenElement || ledPanel.classList.contains('ios-fullscreen-fallback')) && asideElement) {
         if (isDraggingInsideAside) return;
         
         // Ignore clicks inside the aside panel

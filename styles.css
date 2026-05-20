@@ -177,7 +177,11 @@ input[type=range]:hover::-webkit-slider-thumb {
 }
 
 /* Fullscreen mode styling for LED Panel */
-#led-wrapper:fullscreen {
+#led-wrapper:fullscreen,
+#led-wrapper.ios-fullscreen-fallback {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
     width: 100vw !important;
     height: 100vh !important;
     max-width: none !important;
@@ -186,9 +190,11 @@ input[type=range]:hover::-webkit-slider-thumb {
     border-radius: 0 !important;
     box-shadow: none !important;
     background-color: #000000 !important;
+    z-index: 99999 !important;
 }
 
-#led-wrapper:fullscreen #led-panel {
+#led-wrapper:fullscreen #led-panel,
+#led-wrapper.ios-fullscreen-fallback #led-panel {
     width: 100% !important;
     height: 100% !important;
     border: none !important;
@@ -196,12 +202,14 @@ input[type=range]:hover::-webkit-slider-thumb {
 }
 
 /* Ensure matrix text and styling adapts nicely on large display monitors */
-#led-wrapper:fullscreen .led-matrix-text {
+#led-wrapper:fullscreen .led-matrix-text,
+#led-wrapper.ios-fullscreen-fallback .led-matrix-text {
     font-size: 14vw !important;
     letter-spacing: 4px !important;
 }
 
-#led-wrapper:fullscreen .led-matrix-overlay {
+#led-wrapper:fullscreen .led-matrix-overlay,
+#led-wrapper.ios-fullscreen-fallback .led-matrix-overlay {
     background-size: 10px 10px !important;
     /* Scale up spacing for crisp matrix dot presentation */
 }
