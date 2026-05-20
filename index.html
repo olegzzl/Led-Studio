@@ -3403,10 +3403,12 @@
                 const min = parseFloat(input.min) || 0;
                 const max = parseFloat(input.max) || 100;
                 const val = parseFloat(input.value) || 0;
-                const pct = (val - min) / (max - min);
-                const thumbX = pct * rect.width;
                 
-                const threshold = 35; // px hit target around thumb center
+                const thumbWidth = 20; // standard thumb width in pixels
+                const pct = (max - min) > 0 ? (val - min) / (max - min) : 0.5;
+                const thumbX = thumbWidth / 2 + pct * (rect.width - thumbWidth);
+                
+                const threshold = 45; // large hit target for touch screens
                 
                 if (Math.abs(touchX - thumbX) <= threshold) {
                     isDraggingThumb = true;
