@@ -873,7 +873,8 @@
         // Initialize AudioContext early to prevent late-binding source bug in browsers
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 256;
+        analyser.fftSize = 1024;
+        analyser.smoothingTimeConstant = 0.2; // Near-zero latency, real-time response
         const dataArray = new Uint8Array(analyser.frequencyBinCount);
         const sourceFile = audioCtx.createMediaElementSource(audioPlayer);
         sourceFile.connect(analyser);
@@ -2525,15 +2526,13 @@
                     }
                 }
 
-                const binMapping = [];
-                const maxUsefulBin = 70; // Limit visualization range to ~12 kHz (where music actually has energy)
-                for (let i = 0; i < eqCols; i++) {
-                    const progress = i / Math.max(1, eqCols - 1);
-                    // Logarithmic mapping up to maxUsefulBin
-                    let binIndex = Math.floor(Math.pow(progress, 1.5) * (maxUsefulBin - 2)) + 2;
-                    if (binIndex >= dataArray.length) binIndex = dataArray.length - 1;
-                    binMapping.push(binIndex);
-                }
+                // === Studio-grade logarithmic spectrum analyzer ===
+                // Logarithmic frequency mapping (30 Hz – 16 kHz) like professional DAW analyzers
+                const sampleRate = audioCtx.sampleRate || 44100;
+                const minFreq = 30;
+                const maxFreq = 16000;
+                const logMin = Math.log10(minFreq);
+                const logMax = Math.log10(maxFreq);
 
                 const baseOpacity = brightSlider.value / 100;
                 let activeCount = 0;
@@ -2578,63 +2577,37 @@
                     radius = 1;
                 }
 
-                const bassRange = Math.max(3, Math.floor(eqCols * 0.25));
-
                 for (let c = 0; c < eqCols; c++) {
-                    const bin = binMapping[c];
-                    let val = 0;
+                    // Calculate logarithmic frequency band boundaries for this column
+                    const logFreqLow = logMin + (c / eqCols) * (logMax - logMin);
+                    const logFreqHigh = logMin + ((c + 1) / eqCols) * (logMax - logMin);
+                    const freqLow = Math.pow(10, logFreqLow);
+                    const freqHigh = Math.pow(10, logFreqHigh);
 
-                    if (c < Math.max(3, Math.floor(eqCols * 0.2))) {
-                        val = dataArray[bin];
-                    } else {
-                        const windowSize = Math.min(5, Math.floor(c / 3));
-                        let sum = 0, count = 0;
-                        for (let k = bin - Math.floor(windowSize / 2); k <= bin + Math.floor(windowSize / 2); k++) {
-                            if (k >= 0 && k < dataArray.length) {
-                                sum += dataArray[k];
-                                count++;
-                            }
-                        }
-                        val = sum / (count || 1);
+                    // Convert frequencies to FFT bin indices
+                    const binLow = Math.max(0, Math.floor(freqLow * analyser.fftSize / sampleRate));
+                    const binHigh = Math.min(dataArray.length - 1, Math.ceil(freqHigh * analyser.fftSize / sampleRate));
+
+                    // Average all FFT bins within this frequency band
+                    let sum = 0, count = 0;
+                    for (let b = binLow; b <= binHigh; b++) {
+                        sum += dataArray[b];
+                        count++;
                     }
+                    let val = count > 0 ? sum / count : 0;
 
-                    // Subtract noise floor for lowest frequency bins to reduce ambient room hum / mic rumble
-                    if (bin < 12) {
-                        const rumbleReduction = (12 - bin) * 6; // progressive reduction (e.g. -72 for bin 0, -66 for bin 1)
-                        val = Math.max(0, val - rumbleReduction);
-                    }
-
-                    // Determine band sensitivity multiplier
+                    // Smooth gradient band sensitivity (bass → mids → treble)
                     let bandSens = 1.0;
-                    const bassEnd = Math.max(3, Math.floor(eqCols * 0.25));
-                    const midEnd = Math.floor(eqCols * 0.75);
-                    if (c < bassEnd) {
-                        bandSens = eqSensBass;
-                    } else if (c < midEnd) {
-                        bandSens = eqSensMids;
+                    const progress = c / Math.max(1, eqCols - 1);
+                    if (progress <= 0.5) {
+                        const t = progress / 0.5;
+                        bandSens = eqSensBass * (1 - t) + eqSensMids * t;
                     } else {
-                        bandSens = eqSensTreble;
+                        const t = (progress - 0.5) / 0.5;
+                        bandSens = eqSensMids * (1 - t) + eqSensTreble * t;
                     }
 
-                    val = val * 0.72 * eqSensitivity * bandSens; // Slightly increased gain (0.72) to compensate for rumble filtering
-                    
-                    // Bass dynamics enhancement: expand contrast for low frequencies (quadratic factor 2.0)
-                    // so they bounce dynamically on beats instead of staying flat at high values
-                    if (c < bassRange) {
-                        val = Math.pow(val / 255, 2.0) * 255;
-                    }
-
-                    // Treble boost curve: boost higher frequencies dynamically
-                    let boost = 1.0;
-                    if (c >= bassRange) {
-                        // Progressive boost for midrange and treble
-                        boost = 1.0 + (c - bassRange) * (1.8 / (eqCols - bassRange));
-                    }
-                    if (c >= eqCols - Math.max(2, Math.floor(eqCols * 0.15))) {
-                        // Extra boost for the very high frequencies (rightmost 15% of columns)
-                        boost *= 1.8;
-                    }
-                    val = val * boost;
+                    val = val * eqSensitivity * bandSens;
                     val = Math.min(255, val);
                     totalVolume += val;
 
