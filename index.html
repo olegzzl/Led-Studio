@@ -825,6 +825,9 @@
         </aside>
     </main>
 
+    <!-- Hidden audio player element for file playback -->
+    <audio id="audio-player-element" preload="auto" src="SOUND Studio.mp3" style="display:none;"></audio>
+
     <!-- Interactive script embedded inline to guarantee immediate cache-free execution -->
     <script>
         const ledPanel = document.getElementById('led-panel');
@@ -863,24 +866,181 @@
         let peakHoldTime = Array(20).fill(0);
         let colDisplayHeight = Array(20).fill(0);
 
-        // Playlist track registry
-        let playlist = [];
+        // Playlist track registry — pre-loaded with default demo track
+        let playlist = [
+            { name: 'SOUND Studio.mp3', url: 'SOUND Studio.mp3' }
+        ];
         let currentPlaylistIndex = 0;
 
-        // Hidden audio element for file playback
-        const audioPlayer = document.createElement('audio');
+        // Audio player element (real DOM <audio> tag for maximum browser compatibility)
+        const audioPlayer = document.getElementById('audio-player-element');
+        audioPlayer.volume = 0.7;
 
-        // Initialize AudioContext early to prevent late-binding source bug in browsers
+        // Debug: log audio loading errors to console
+        audioPlayer.addEventListener('error', function(e) {
+            console.error('Audio loading error:', audioPlayer.error);
+            const info = document.getElementById('player-track-info');
+            if (info) info.textContent = 'Error loading audio file';
+        });
+
+        // Initialize AudioContext and analyser (context starts suspended per browser autoplay policy)
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const analyser = audioCtx.createAnalyser();
         analyser.fftSize = 1024;
-        analyser.smoothingTimeConstant = 0.2; // Near-zero latency, real-time response
+        analyser.smoothingTimeConstant = 0.2;
         const dataArray = new Uint8Array(analyser.frequencyBinCount);
-        const sourceFile = audioCtx.createMediaElementSource(audioPlayer);
-        sourceFile.connect(analyser);
-        // Connect music to speakers
-        sourceFile.connect(audioCtx.destination);
+        // MediaElementSource is created lazily on first user gesture (see initAudio)
+        let sourceFile = null;
         let sourceMic = null;
+
+        // Fetch "SOUND Studio.mp3" as a Blob and convert to object URL to bypass Web Audio CORS restrictions
+        fetch('SOUND Studio.mp3')
+            .then(res => {
+                if (!res.ok) throw new Error('Network response not ok');
+                return res.blob();
+            })
+            .then(blob => {
+                const blobUrl = URL.createObjectURL(blob);
+                playlist[0].url = blobUrl;
+                // If audioPlayer is currently pointing to the raw string URL, update it to the blob URL
+                if (audioPlayer.src.includes('SOUND%20Studio.mp3') || audioPlayer.src.endsWith('SOUND Studio.mp3')) {
+                    audioPlayer.src = blobUrl;
+                    audioPlayer.load();
+                }
+            })
+            .catch(err => {
+                console.warn('Failed to load SOUND Studio.mp3 as blob, falling back to direct play:', err);
+            });
+
+        // Picture-in-Picture Visualizer Window Manager
+        let pipObserver = null;
+
+        async function togglePip() {
+            if (pipWindow) {
+                pipWindow.close();
+                return;
+            }
+
+            if (!('documentPictureInPicture' in window)) {
+                alert(currentLang === 'ru' ? 'Ваш браузер не поддерживает режим "Окно в окне" для произвольного контента. Рекомендуется использовать Google Chrome или Microsoft Edge последних версий.' : 'Your browser does not support Document Picture-in-Picture. Please use Chrome or Edge.');
+                return;
+            }
+
+            try {
+                // Request a Picture-in-Picture window for the HTML content
+                pipWindow = await documentPictureInPicture.requestWindow({
+                    width: 640,
+                    height: 480
+                });
+
+                // Style the PiP window body
+                pipWindow.document.body.style.backgroundColor = '#000000';
+                pipWindow.document.body.style.margin = '0';
+                pipWindow.document.body.style.overflow = 'hidden';
+                pipWindow.document.body.style.width = '100vw';
+                pipWindow.document.body.style.height = '100vh';
+
+                // Move the contentWrapper to PiP window
+                const contentWrapper = document.getElementById('led-content-wrapper');
+                if (contentWrapper) {
+                    pipWindow.document.body.appendChild(contentWrapper);
+                    contentWrapper.style.width = '100%';
+                    contentWrapper.style.height = '100%';
+                }
+
+                // Copy styles (links and stylesheets) to PiP window
+                Array.from(document.querySelectorAll('link[rel="stylesheet"], style')).forEach((el) => {
+                    pipWindow.document.head.appendChild(el.cloneNode(true));
+                });
+
+                // Clone Tailwind script and config if present
+                const tailwindScript = document.querySelector('script[src*="tailwindcss.com"]');
+                if (tailwindScript) {
+                    pipWindow.document.head.appendChild(tailwindScript.cloneNode(true));
+                }
+                const tailwindConfig = document.getElementById('tailwind-config');
+                if (tailwindConfig) {
+                    pipWindow.document.head.appendChild(tailwindConfig.cloneNode(true));
+                }
+
+                // Set up MutationObserver to sync ledPanel classes and styles (flashes, colors, presets)
+                pipObserver = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                            const style = ledPanel.getAttribute('style');
+                            if (style) {
+                                pipWindow.document.body.setAttribute('style', style);
+                                pipWindow.document.body.style.backgroundColor = '#000000';
+                                pipWindow.document.body.style.margin = '0';
+                                pipWindow.document.body.style.overflow = 'hidden';
+                                pipWindow.document.body.style.width = '100vw';
+                                pipWindow.document.body.style.height = '100vh';
+                            }
+                        }
+                        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                            pipWindow.document.body.className = ledPanel.className;
+                        }
+                    });
+                });
+                pipObserver.observe(ledPanel, { attributes: true, attributeFilter: ['style', 'class'] });
+
+                // Sync initial classes and styles
+                pipWindow.document.body.className = ledPanel.className;
+                const initialStyle = ledPanel.getAttribute('style');
+                if (initialStyle) {
+                    pipWindow.document.body.setAttribute('style', initialStyle);
+                }
+                pipWindow.document.body.style.backgroundColor = '#000000';
+                pipWindow.document.body.style.margin = '0';
+                pipWindow.document.body.style.overflow = 'hidden';
+                pipWindow.document.body.style.width = '100vw';
+                pipWindow.document.body.style.height = '100vh';
+
+                // Listen for closing the PiP window to restore the visualizer
+                pipWindow.addEventListener('pagehide', () => {
+                    if (pipObserver) {
+                        pipObserver.disconnect();
+                        pipObserver = null;
+                    }
+                    const wrapper = pipWindow.document.getElementById('led-content-wrapper');
+                    if (wrapper) {
+                        ledPanel.insertBefore(wrapper, ledPanel.firstChild);
+                        wrapper.style.width = '';
+                        wrapper.style.height = '';
+                    }
+                    pipWindow = null;
+                    updatePipButtonState();
+                    
+                    // Delay slightly to allow DOM layout reflow to complete
+                    setTimeout(() => {
+                        rebuildEqualizerGrid();
+                        if (marqueeActive && typeof updateMarqueeParams === 'function') {
+                            updateMarqueeParams();
+                        }
+                    }, 50);
+                });
+
+                updatePipButtonState();
+                rebuildEqualizerGrid();
+
+            } catch (err) {
+                console.error('Failed to open PiP window:', err);
+                pipWindow = null;
+            }
+        }
+
+        function updatePipButtonState() {
+            const pipBtn = document.getElementById('pip-btn');
+            if (!pipBtn) return;
+            
+            if (pipWindow) {
+                pipBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">close</span>';
+                pipBtn.title = currentLang === 'ru' ? 'Вернуть в окно' : (currentLang === 'ua' ? 'Повернути у вікно' : 'Restore window');
+            } else {
+                pipBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">picture_in_picture_alt</span>';
+                pipBtn.title = currentLang === 'ru' ? 'Открыть в отдельном окне' : (currentLang === 'ua' ? 'Відкрити в окремому вікні' : 'Pop out visualizer');
+            }
+        }
 
         // Multi-language Translation Engine (EN, RU, UA)
         let currentLang = localStorage.getItem('led-studio-lang') || 'en';
@@ -1102,6 +1262,8 @@
                 else if (lang === 'ua') eqPresetInput.placeholder = 'Ім\'я пресета...';
                 else eqPresetInput.placeholder = 'Preset name...';
             }
+
+            updatePipButtonState();
         }
 
         // Наблюдатель изменения размеров для динамического масштабирования в полноэкранном режиме
@@ -1129,6 +1291,12 @@
                     preFullscreenHeight = height || 432;
                 }
                 ledPanel.style.setProperty('--led-scale', ledScale);
+
+                // Keep equalizer canvas dimensions in sync with panel size changes (only if not in PiP mode)
+                if (!pipWindow) {
+                    rebuildEqualizerGrid();
+                }
+
                 if (marqueeActive && typeof updateMarqueeParams === 'function') {
                     updateMarqueeParams();
                 }
@@ -2034,10 +2202,19 @@
             }
         });
 
-        // Audio Initialization
-        function initAudio() {
+        // Audio Initialization — called on every user gesture that needs audio
+        // Lazily creates the MediaElementSource on first call so it happens
+        // inside a user-gesture context (required by browser autoplay policy).
+        async function initAudio() {
+            // Resume suspended AudioContext (browser blocks it until user gesture)
             if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
+                await audioCtx.resume();
+            }
+            // Connect audio player to Web Audio API graph on first call
+            if (!sourceFile) {
+                sourceFile = audioCtx.createMediaElementSource(audioPlayer);
+                sourceFile.connect(analyser);
+                sourceFile.connect(audioCtx.destination);
             }
         }
 
@@ -2279,7 +2456,7 @@
         }
 
         // Start Equalizer Mode
-        function startEqualizerMode(mode) {
+        async function startEqualizerMode(mode) {
             if (typeof mode !== 'string') mode = activeEqMode;
             if (!equalizerActive) {
                 clearActivePreset();
@@ -2332,7 +2509,7 @@
             }
 
             // Initialize context
-            initAudio();
+            await initAudio();
 
             rebuildEqualizerGrid();
 
@@ -2707,8 +2884,8 @@
         }
 
         // Toggle Microphone
-        function toggleMicrophone() {
-            initAudio();
+        async function toggleMicrophone() {
+            await initAudio();
 
             if (!micActive) {
                 micActive = true;
@@ -2880,7 +3057,7 @@
                 const isActive = (index === currentPlaylistIndex);
 
                 item.className = `flex items-center justify-between py-1 px-1.5 rounded transition-colors cursor-pointer ${isActive
-                    ? 'bg-surface-container-high text-[#10b981] font-bold'
+                    ? 'bg-surface-container-high text-primary font-bold'
                     : 'text-on-surface-variant hover:bg-surface-container-high'
                     }`;
 
@@ -2894,7 +3071,7 @@
                 controlsContainer.className = 'flex items-center gap-1.5 shrink-0';
 
                 const playIcon = document.createElement('span');
-                playIcon.className = `material-symbols-outlined text-[13px] ${isActive ? 'text-[#10b981]' : 'text-outline-variant'}`;
+                playIcon.className = `material-symbols-outlined text-[13px] ${isActive ? 'text-primary' : 'text-outline-variant'}`;
                 playIcon.textContent = (isActive && !audioPlayer.paused) ? 'volume_up' : 'play_arrow';
 
                 const deleteBtn = document.createElement('span');
@@ -2926,7 +3103,7 @@
 
             // "+ Add Track..."
             const addTrackItem = document.createElement('div');
-            addTrackItem.className = 'flex-1 flex items-center justify-center gap-1.5 py-1 px-1.5 border border-dashed border-outline-variant hover:border-primary hover:bg-surface-container-high text-[#10b981]/80 hover:text-[#10b981] transition-colors text-[9px] font-mono cursor-pointer';
+            addTrackItem.className = 'flex-1 flex items-center justify-center gap-1.5 py-1 px-1.5 border border-dashed border-outline-variant hover:border-primary hover:bg-surface-container-high text-on-surface-variant hover:text-primary transition-colors text-[9px] font-mono cursor-pointer';
 
             const addTrackIcon = document.createElement('span');
             addTrackIcon.className = 'material-symbols-outlined text-[12px]';
@@ -2946,7 +3123,7 @@
 
             // "+ Add Folder..."
             const addFolderItem = document.createElement('div');
-            addFolderItem.className = 'flex-1 flex items-center justify-center gap-1.5 py-1 px-1.5 border border-dashed border-outline-variant hover:border-primary hover:bg-surface-container-high text-[#10b981]/80 hover:text-[#10b981] transition-colors text-[9px] font-mono cursor-pointer';
+            addFolderItem.className = 'flex-1 flex items-center justify-center gap-1.5 py-1 px-1.5 border border-dashed border-outline-variant hover:border-primary hover:bg-surface-container-high text-on-surface-variant hover:text-primary transition-colors text-[9px] font-mono cursor-pointer';
 
             const addFolderIcon = document.createElement('span');
             addFolderIcon.className = 'material-symbols-outlined text-[12px]';
@@ -2999,7 +3176,7 @@
         }
 
         // Select and play a track
-        function selectTrack(index) {
+        async function selectTrack(index) {
             currentPlaylistIndex = index;
             const track = playlist[index];
 
@@ -3014,12 +3191,14 @@
             playerNextBtn.disabled = false;
             playerProgress.disabled = false;
 
-            initAudio();
-
-
+            await initAudio();
 
             stopMicrophone();
-            audioPlayer.play();
+            try {
+                await audioPlayer.play();
+            } catch (err) {
+                console.error('Play failed:', err);
+            }
             if (!equalizerActive) {
                 startEqualizerMode();
             }
@@ -3277,12 +3456,16 @@
             if (dot) dot.style.backgroundColor = `hsl(${hue}, 100%, 50%)`;
         }
 
-        playerPlayBtn.addEventListener('click', function () {
-            initAudio();
+        playerPlayBtn.addEventListener('click', async function () {
+            await initAudio();
 
             if (audioPlayer.paused) {
                 stopMicrophone();
-                audioPlayer.play();
+                try {
+                    await audioPlayer.play();
+                } catch (err) {
+                    console.error('Play failed:', err);
+                }
                 if (!equalizerActive) {
                     startEqualizerMode();
                 }
@@ -3362,6 +3545,9 @@
 
         // Initialize default track on load
         function initPlaylist() {
+            // Sync audio volume with the volume slider default
+            audioPlayer.volume = playerVolume.value / 100;
+
             if (playlist.length > 0) {
                 const track = playlist[0];
                 audioPlayer.src = track.url;
